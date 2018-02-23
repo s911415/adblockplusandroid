@@ -1,0 +1,3 @@
+[submodule "app/src/main/cpp/libadblockplus-binaries"]
+	path = app/src/main/cpp/libadblockplus-binaries
+	url = https://github.com/adblockplus/libadblockplus-binaries.git
