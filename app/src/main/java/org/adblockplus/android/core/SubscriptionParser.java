@@ -15,7 +15,7 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.core;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

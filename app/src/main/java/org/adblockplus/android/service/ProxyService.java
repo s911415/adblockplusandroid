@@ -15,7 +15,7 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.service;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -31,9 +31,12 @@ import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import org.adblockplus.android.*;
+import org.adblockplus.android.activity.preference.Preferences;
 import org.adblockplus.android.configurators.ProxyConfigurator;
 import org.adblockplus.android.configurators.ProxyConfigurators;
 import org.adblockplus.android.configurators.ProxyRegistrationType;
+import org.adblockplus.android.core.type.ProxyServerType;
 import org.apache.commons.lang.StringUtils;
 import sunlabs.brazil.server.Server;
 import sunlabs.brazil.util.Base64;
@@ -483,7 +486,15 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
         }
     }
 
-    final class ProxyServer extends Server {
+    public int getPort() {
+        return port;
+    }
+
+    public ProxyServer getProxy() {
+        return proxy;
+    }
+
+    public final class ProxyServer extends Server {
         @Override
         public void close() {
             try {

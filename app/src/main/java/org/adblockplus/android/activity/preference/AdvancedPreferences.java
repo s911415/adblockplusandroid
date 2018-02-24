@@ -15,10 +15,11 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.activity.preference;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,12 +35,19 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.adblockplus.android.AdblockPlus;
+import org.adblockplus.android.CrashHandler;
+import org.adblockplus.android.R;
+import org.adblockplus.android.Utils;
 import org.adblockplus.android.compat.ProxyProperties;
 import org.adblockplus.android.configurators.IptablesProxyConfigurator;
+import org.adblockplus.android.service.ProxyService;
+import org.adblockplus.android.service.ServiceBinder;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Advanced settings UI.
@@ -154,7 +162,7 @@ public class AdvancedPreferences extends SummarizedPreferences {
                 final ProxyService proxyService = this.serviceBinder.get();
 
                 if (proxyService != null) {
-                    items.add(String.format("Local port: %d", proxyService.port));
+                    items.add(String.format("Local port: %d", proxyService.getPort()));
                     if (proxyService.isIptables()) {
                         items.add("Running in root mode");
                         items.add("iptables output:");
@@ -177,9 +185,16 @@ public class AdvancedPreferences extends SummarizedPreferences {
                         }
                     }
                     items.add("Proxy settings:");
-                    items.add(String.format("Host: [%s] Port: [%s] Excl: [%s]", proxyService.proxy.props.getProperty("adblock.proxyHost"), proxyService.proxy.props.getProperty("adblock.proxyPort"),
-                            proxyService.proxy.props.getProperty("adblock.proxyExcl")));
-                    if (proxyService.proxy.props.getProperty("adblock.auth") != null)
+                    Properties proxyServerProps = proxyService.getProxy().props;
+                    items.add(
+                            String.format(
+                                    "Host: [%s] Port: [%s] Excl: [%s]",
+                                    proxyServerProps.getProperty("adblock.proxyHost"),
+                                    proxyServerProps.getProperty("adblock.proxyPort"),
+                                    proxyServerProps.getProperty("adblock.proxyExcl")
+                            )
+                    );
+                    if (proxyServerProps.getProperty("adblock.auth") != null)
                         items.add("Auth: yes");
                 } else {
                     items.add("Service not running");
@@ -192,7 +207,7 @@ public class AdvancedPreferences extends SummarizedPreferences {
                 messageText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View v) {
-                        final ClipboardManager manager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                        final ClipboardManager manager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                         final TextView showTextParam = (TextView) v;
                         manager.setText(showTextParam.getText());
                         Toast.makeText(v.getContext(), R.string.msg_clipboard, Toast.LENGTH_SHORT).show();

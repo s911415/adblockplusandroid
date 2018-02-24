@@ -15,13 +15,16 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.core.type;
 
-public class Subscription {
-    public String title;
-    public String specialization;
-    public String url;
-    public String homepage;
-    public String[] prefixes;
-    public String author;
+public enum ProxyServerType {
+    UNKNOWN,
+    /**
+     * A pure http proxy
+     */
+    HTTP,
+    /**
+     * Http and https proxy.
+     */
+    HTTPS
 }

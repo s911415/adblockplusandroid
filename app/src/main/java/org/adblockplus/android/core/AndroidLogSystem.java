@@ -15,20 +15,29 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.core;
 
-import android.content.Context;
-import org.adblockplus.libadblockplus.UpdateAvailableCallback;
+import android.util.Log;
+import org.adblockplus.libadblockplus.LogSystem;
 
-public class AndroidUpdateAvailableCallback extends UpdateAvailableCallback {
-    private final Context context;
-
-    public AndroidUpdateAvailableCallback(final Context context) {
-        this.context = context;
+public class AndroidLogSystem extends LogSystem {
+    private static int abpLogLevelToAndroid(final LogLevel level) {
+        switch (level) {
+            default:
+            case TRACE:
+            case LOG:
+                return Log.VERBOSE;
+            case INFO:
+                return Log.INFO;
+            case WARN:
+                return Log.WARN;
+            case ERROR:
+                return Log.ERROR;
+        }
     }
 
     @Override
-    public void updateAvailableCallback(String url) {
-        Utils.showUpdateNotification(this.context, url, null);
+    public void logCallback(final LogLevel level, final String message, final String source) {
+        Log.println(abpLogLevelToAndroid(level), source, message);
     }
 }

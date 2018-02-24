@@ -15,7 +15,7 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.activity.preference;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -39,6 +39,12 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.*;
 import android.widget.TextView;
+import org.adblockplus.android.*;
+import org.adblockplus.android.activity.ProxyConfigurationActivity;
+import org.adblockplus.android.core.Subscription;
+import org.adblockplus.android.activity.dialog.AboutDialog;
+import org.adblockplus.android.service.ProxyService;
+import org.adblockplus.android.service.ServiceBinder;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -343,7 +349,7 @@ public class Preferences extends SummarizedPreferences {
             try {
                 Log.d(TAG, "Copy: install/" + files[i]);
                 final InputStream in = assetManager.open("install/" + files[i]);
-                final OutputStream out = openFileOutput(files[i], MODE_PRIVATE);
+                final OutputStream out = openFileOutput(files[i], Context.MODE_PRIVATE);
                 final byte[] buffer = new byte[1024];
                 int read;
                 while ((read = in.read(buffer)) != -1) {
@@ -361,7 +367,7 @@ public class Preferences extends SummarizedPreferences {
     public void showProxySettings(final View v) {
         final ProxyService proxyService = this.serviceBinder.get();
         if (proxyService != null) {
-            startActivity(new Intent(this, ProxyConfigurationActivity.class).putExtra("port", proxyService.port));
+            startActivity(new Intent(this, ProxyConfigurationActivity.class).putExtra("port", proxyService.getPort()));
         }
     }
 

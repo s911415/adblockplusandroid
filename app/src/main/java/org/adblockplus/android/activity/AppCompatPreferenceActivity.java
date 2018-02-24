@@ -1,4 +1,4 @@
-package org.adblockplus.android;
+package org.adblockplus.android.activity;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

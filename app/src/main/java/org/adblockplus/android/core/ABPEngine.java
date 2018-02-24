@@ -15,13 +15,19 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.core;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build.VERSION;
 import android.util.Log;
+import org.adblockplus.android.R;
+import org.adblockplus.android.Utils;
+import org.adblockplus.android.core.callback.AndroidFilterChangeCallback;
+import org.adblockplus.android.core.callback.AndroidShowNotificationCallback;
+import org.adblockplus.android.core.callback.AndroidUpdateAvailableCallback;
+import org.adblockplus.android.core.callback.AndroidUpdateCheckDoneCallback;
 import org.adblockplus.libadblockplus.*;
 import org.adblockplus.libadblockplus.FilterEngine.ContentType;
 import org.adblockplus.libadblockplus.Subscription;
@@ -115,8 +121,8 @@ public final class ABPEngine {
         return engine;
     }
 
-    private static org.adblockplus.android.Subscription convertJsSubscription(final Subscription jsSubscription) {
-        final org.adblockplus.android.Subscription subscription = new org.adblockplus.android.Subscription();
+    private static org.adblockplus.android.core.Subscription convertJsSubscription(final Subscription jsSubscription) {
+        final org.adblockplus.android.core.Subscription subscription = new org.adblockplus.android.core.Subscription();
 
         subscription.title = jsSubscription.getProperty("title").toString();
         subscription.url = jsSubscription.getProperty("url").toString();
@@ -124,8 +130,8 @@ public final class ABPEngine {
         return subscription;
     }
 
-    private static org.adblockplus.android.Subscription[] convertJsSubscriptions(final List<Subscription> jsSubscriptions) {
-        final org.adblockplus.android.Subscription[] subscriptions = new org.adblockplus.android.Subscription[jsSubscriptions.size()];
+    private static org.adblockplus.android.core.Subscription[] convertJsSubscriptions(final List<Subscription> jsSubscriptions) {
+        final org.adblockplus.android.core.Subscription[] subscriptions = new org.adblockplus.android.core.Subscription[jsSubscriptions.size()];
 
         for (int i = 0; i < subscriptions.length; i++) {
             subscriptions[i] = convertJsSubscription(jsSubscriptions.get(i));
@@ -185,11 +191,11 @@ public final class ABPEngine {
         return this.elemhideEnabled;
     }
 
-    public org.adblockplus.android.Subscription[] getRecommendedSubscriptions() {
+    public org.adblockplus.android.core.Subscription[] getRecommendedSubscriptions() {
         return convertJsSubscriptions(this.filterEngine.fetchAvailableSubscriptions());
     }
 
-    public org.adblockplus.android.Subscription[] getListedSubscriptions() {
+    public org.adblockplus.android.core.Subscription[] getListedSubscriptions() {
         return convertJsSubscriptions(this.filterEngine.getListedSubscriptions());
     }
 

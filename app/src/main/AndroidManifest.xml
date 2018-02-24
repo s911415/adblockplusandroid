@@ -20,7 +20,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".Preferences"
+            android:name=".activity.preference.Preferences"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,33 +29,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AdvancedPreferences"
+            android:name=".activity.preference.AdvancedPreferences"
             android:label="@string/app_name" />
         <activity
-            android:name=".ConfigurationActivity"
+            android:name=".activity.ConfigurationActivity"
             android:excludeFromRecents="true"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
-            android:name=".ProxyConfigurationActivity"
+            android:name=".activity.ProxyConfigurationActivity"
             android:excludeFromRecents="true"
             android:label="@string/proxysettings_name"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
-            android:name=".CrashReportDialog"
+            android:name=".activity.dialog.CrashReportDialog"
             android:excludeFromRecents="true"
             android:label="@string/crash_name"
             android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
-            android:name=".updater.UpdaterActivity"
+            android:name=".activity.UpdaterActivity"
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent" />
 
-        <service android:name=".ProxyService" />
-        <service android:name=".updater.UpdaterService" />
+        <service android:name=".service.ProxyService" />
+        <service android:name=".service.UpdaterService" />
 
         <receiver android:name=".Starter" >
             <intent-filter>

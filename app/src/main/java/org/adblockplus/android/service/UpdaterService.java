@@ -15,7 +15,7 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android.updater;
+package org.adblockplus.android.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -31,6 +31,7 @@ import android.util.Log;
 import org.adblockplus.android.AdblockPlus;
 import org.adblockplus.android.R;
 import org.adblockplus.android.Utils;
+import org.adblockplus.android.activity.UpdaterActivity;
 
 import java.io.*;
 import java.net.URL;

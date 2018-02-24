@@ -23,7 +23,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import org.adblockplus.android.updater.UpdaterActivity;
+import org.adblockplus.android.activity.UpdaterActivity;
 import org.adblockplus.libadblockplus.JsValue;
 import org.adblockplus.libadblockplus.Subscription;
 import org.apache.commons.lang.StringUtils;
@@ -50,7 +50,7 @@ public final class Utils {
         return Character.isUpperCase(first) ? s : Character.toUpperCase(first) + s.substring(1);
     }
 
-    protected static void showUpdateNotification(final Context context, final String url,
+    public static void showUpdateNotification(final Context context, final String url,
                                                  final String error) {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentTitle(context.getText(R.string.app_name));
@@ -82,7 +82,7 @@ public final class Utils {
         notificationManager.notify(AdblockPlus.UPDATE_NOTIFICATION_ID, notification);
     }
 
-    protected static void updateSubscriptionStatus(final Context context, final Subscription sub) {
+    public static void updateSubscriptionStatus(final Context context, final Subscription sub) {
         final JsValue jsDownloadStatus = sub.getProperty("downloadStatus");
         final String downloadStatus = jsDownloadStatus.isNull() ? "" : jsDownloadStatus.toString();
         final long lastDownload = sub.getProperty("lastDownload").asLong();

@@ -1,4 +1,4 @@
-package org.adblockplus.android;
+package org.adblockplus.android.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import org.adblockplus.android.R;
+import org.adblockplus.android.Utils;
+import org.adblockplus.android.service.ProxyService;
 
 public class ProxyConfigurationActivity extends AppCompatActivity {
     @Override

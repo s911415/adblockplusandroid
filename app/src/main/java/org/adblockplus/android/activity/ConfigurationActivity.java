@@ -15,7 +15,7 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.activity;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -24,6 +24,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
+import org.adblockplus.android.R;
+import org.adblockplus.android.service.ProxyService;
 
 /**
  * Displays configuration warning message.

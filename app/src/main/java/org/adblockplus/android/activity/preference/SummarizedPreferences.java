@@ -15,13 +15,15 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.activity.preference;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.*;
+import org.adblockplus.android.BuildConfig;
+import org.adblockplus.android.activity.AppCompatPreferenceActivity;
 
 /**
  * PreferencesActivity which automatically sets preference summaries according

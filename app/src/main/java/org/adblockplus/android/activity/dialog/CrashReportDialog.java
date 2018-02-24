@@ -15,7 +15,7 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.activity.dialog;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +26,9 @@ import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
+import org.adblockplus.android.CrashHandler;
+import org.adblockplus.android.R;
+import org.adblockplus.android.Utils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;

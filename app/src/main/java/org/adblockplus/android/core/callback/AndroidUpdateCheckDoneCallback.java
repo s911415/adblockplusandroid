@@ -15,10 +15,11 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.core.callback;
 
 import android.content.Context;
 import android.util.Log;
+import org.adblockplus.android.Utils;
 import org.adblockplus.libadblockplus.UpdateCheckDoneCallback;
 import org.apache.commons.lang.StringUtils;
 

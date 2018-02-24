@@ -7,11 +7,11 @@
         android:summaryOn="@string/pref_enabled_summary_on"
         android:title="@string/pref_enabled_title" />
 
-    <org.adblockplus.android.RefreshableListPreference
+    <org.adblockplus.android.activity.preference.RefreshableListPreference
         android:key="@string/pref_subscription"
         android:title="@string/pref_subscription_title" />
 
-    <org.adblockplus.android.HelpfulCheckBoxPreference
+    <org.adblockplus.android.activity.preference.HelpfulCheckBoxPreference
         android:key="@string/pref_acceptableads"
         android:summaryOff="@string/pref_acceptableads_summary_off"
         android:summaryOn="@string/pref_acceptableads_summary_on"

@@ -17,7 +17,7 @@
 
 package org.adblockplus.android.configurators;
 
-import org.adblockplus.android.ProxyServerType;
+import org.adblockplus.android.core.type.ProxyServerType;
 
 public enum ProxyRegistrationType {
     UNKNOWN(ProxyServerType.UNKNOWN, false),

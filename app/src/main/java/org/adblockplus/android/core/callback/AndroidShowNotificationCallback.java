@@ -15,12 +15,15 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.core.callback;
 
 import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import org.adblockplus.android.AdblockPlus;
+import org.adblockplus.android.R;
+import org.adblockplus.android.Utils;
 import org.adblockplus.libadblockplus.Notification;
 import org.adblockplus.libadblockplus.ShowNotificationCallback;
 

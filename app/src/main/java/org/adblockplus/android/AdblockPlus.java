@@ -34,6 +34,11 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
+import org.adblockplus.android.core.ABPEngine;
+import org.adblockplus.android.core.ReferrerMapping;
+import org.adblockplus.android.core.Subscription;
+import org.adblockplus.android.activity.dialog.CrashReportDialog;
+import org.adblockplus.android.service.ProxyService;
 import org.adblockplus.libadblockplus.FilterEngine.ContentType;
 import org.apache.commons.lang.StringUtils;
 

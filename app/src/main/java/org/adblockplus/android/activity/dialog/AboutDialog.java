@@ -15,7 +15,7 @@
  * along with Adblock Plus.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.adblockplus.android;
+package org.adblockplus.android.activity.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -28,6 +28,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import org.adblockplus.android.R;
+import org.adblockplus.android.Utils;
 
 public class AboutDialog extends Dialog {
     public AboutDialog(final Context context) {
