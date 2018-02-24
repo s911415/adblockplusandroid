@@ -19,23 +19,19 @@ package org.adblockplus.libadblockplus;
 
 import java.util.List;
 
-public final class FilterEngine implements Disposable {
+public final class FilterEngine {
     static {
         System.loadLibrary("adblockplus-jni");
         registerNatives();
     }
 
     protected final long ptr;
-    private final Disposer disposer;
 
-    public FilterEngine(final JsEngine jsEngine) {
-        this.ptr = ctor(jsEngine.ptr);
-        this.disposer = new Disposer(this, new DisposeWrapper(this.ptr));
+    FilterEngine(long jniPlatformPtr) {
+        this.ptr = jniPlatformPtr;
     }
 
     private final static native void registerNatives();
-
-    private final static native long ctor(long jsEnginePtr);
 
     private final static native boolean isFirstRun(long ptr);
 
@@ -79,7 +75,21 @@ public final class FilterEngine implements Disposable {
 
     private final static native void setPref(long ptr, String pref, long valuePtr);
 
-    private final static native void dtor(long ptr);
+    private final static native String getHostFromURL(long ptr, String url);
+
+    private final static native void setAllowedConnectionType(long ptr, String value);
+
+    private final static native String getAllowedConnectionType(long ptr);
+
+    private final static native void setAcceptableAdsEnabled(long ptr, boolean enabled);
+
+    private final static native boolean isAcceptableAdsEnabled(long ptr);
+
+    private final static native String getAcceptableAdsSubscriptionURL(long ptr);
+
+    private final static native void updateFiltersAsync(long ptr, String subscriptionUrl);
+
+    private final static native long getNativePtr(long ptr);
 
     public boolean isFirstRun() {
         return isFirstRun(this.ptr);
@@ -173,26 +183,52 @@ public final class FilterEngine implements Disposable {
         setPref(this.ptr, pref, value.ptr);
     }
 
-    @Override
-    public void dispose() {
-        this.disposer.dispose();
+    public String getHostFromURL(String url) {
+        return getHostFromURL(this.ptr, url);
+    }
+
+    public String getAllowedConnectionType() {
+        return getAllowedConnectionType(this.ptr);
+    }
+
+    public void setAllowedConnectionType(String value) {
+        setAllowedConnectionType(this.ptr, value);
+    }
+
+    public boolean isAcceptableAdsEnabled() {
+        return isAcceptableAdsEnabled(this.ptr);
+    }
+
+    public void setAcceptableAdsEnabled(final boolean enabled) {
+        setAcceptableAdsEnabled(this.ptr, enabled);
+    }
+
+    public String getAcceptableAdsSubscriptionURL() {
+        return getAcceptableAdsSubscriptionURL(this.ptr);
+    }
+
+    /**
+     * Schedules updating of a subscription corresponding to the passed URL.
+     *
+     * @param subscriptionUrl may contain query parameters, only the beginning of the string is used
+     *                        to find a corresponding subscription.
+     */
+    public void updateFiltersAsync(String subscriptionUrl) {
+        updateFiltersAsync(this.ptr, subscriptionUrl);
+    }
+
+    /**
+     * Get FilterEngine pointer
+     *
+     * @return C++ FilterEngine instance pointer (AdblockPlus::FilterEngine*)
+     */
+    public long getNativePtr() {
+        return getNativePtr(this.ptr);
     }
 
     public static enum ContentType {
-        OTHER, SCRIPT, IMAGE, STYLESHEET, OBJECT, SUBDOCUMENT, DOCUMENT, XMLHTTPREQUEST,
-        OBJECT_SUBREQUEST, FONT, MEDIA
-    }
-
-    private final static class DisposeWrapper implements Disposable {
-        private final long ptr;
-
-        public DisposeWrapper(final long ptr) {
-            this.ptr = ptr;
-        }
-
-        @Override
-        public void dispose() {
-            dtor(this.ptr);
-        }
+        OTHER, SCRIPT, IMAGE, STYLESHEET, OBJECT, SUBDOCUMENT, DOCUMENT, WEBSOCKET,
+        WEBRTC, PING, XMLHTTPREQUEST, OBJECT_SUBREQUEST, MEDIA, FONT, GENERICBLOCK,
+        ELEMHIDE, GENERICHIDE
     }
 }

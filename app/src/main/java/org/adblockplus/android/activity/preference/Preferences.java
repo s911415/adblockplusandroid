@@ -41,10 +41,10 @@ import android.view.*;
 import android.widget.TextView;
 import org.adblockplus.android.*;
 import org.adblockplus.android.activity.ProxyConfigurationActivity;
-import org.adblockplus.android.core.Subscription;
 import org.adblockplus.android.activity.dialog.AboutDialog;
 import org.adblockplus.android.service.ProxyService;
 import org.adblockplus.android.service.ServiceBinder;
+import org.adblockplus.libadblockplus.android.Subscription;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -379,7 +379,7 @@ public class Preferences extends SummarizedPreferences {
                 dialog = new AboutDialog(this);
                 break;
             case HIDEICONWARNING_DIALOG:
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppTheme_CustomDialog);
                 builder.setTitle(R.string.warning);
                 builder.setIcon(android.R.drawable.ic_dialog_alert);
                 builder.setCancelable(false);

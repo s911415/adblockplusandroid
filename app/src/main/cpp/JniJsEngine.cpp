@@ -18,39 +18,7 @@
 #include <AdblockPlus.h>
 #include "Utils.h"
 #include "JniCallbacks.h"
-///////////
-//TODO: test
-static void TransformAppInfo(JNIEnv* env, jobject jAppInfo, AdblockPlus::AppInfo& appInfo)
-{
-  jclass clazz = env->GetObjectClass(jAppInfo);
 
-  appInfo.application = JniGetStringField(env, clazz, jAppInfo, "application");
-  appInfo.applicationVersion = JniGetStringField(env, clazz, jAppInfo, "applicationVersion");
-  appInfo.locale = JniGetStringField(env, clazz, jAppInfo, "locale");
-  appInfo.name = JniGetStringField(env, clazz, jAppInfo, "name");
-  appInfo.version = JniGetStringField(env, clazz, jAppInfo, "version");
-
-  appInfo.developmentBuild = JniGetBooleanField(env, clazz, jAppInfo, "developmentBuild");
-}
-
-static jlong JNICALL JniCtor(JNIEnv* env, jclass clazz, jobject jAppInfo)
-{
-  AdblockPlus::AppInfo appInfo;
-
-  TransformAppInfo(env, jAppInfo, appInfo);
-
-  try
-  {
-    return JniPtrToLong(new AdblockPlus::JsEnginePtr(AdblockPlus::JsEngine::New(appInfo)));
-  }
-  CATCH_THROW_AND_RETURN(env, 0)
-}
-
-static void JNICALL JniDtor(JNIEnv* env, jclass clazz, jlong ptr)
-{
-  delete JniLongToTypePtr<AdblockPlus::JsEnginePtr>(ptr);
-}
-//////////
 static AdblockPlus::JsEngine& GetJsEngineRef(jlong ptr)
 {
   return *JniLongToTypePtr<AdblockPlus::JsEngine>(ptr);
@@ -171,8 +139,6 @@ static jobject JNICALL JniNewStringValue(JNIEnv* env, jclass clazz, jlong ptr, j
 
 static JNINativeMethod methods[] =
 {
-  { (char*)"ctor", (char*)"(" TYP("AppInfo") ")J", (void*)JniCtor },
-  { (char*)"dtor", (char*)"(J)V", (void*)JniDtor },
   { (char*)"setEventCallback", (char*)"(JLjava/lang/String;J)V", (void*)JniSetEventCallback },
   { (char*)"removeEventCallback", (char*)"(JLjava/lang/String;)V", (void*)JniRemoveEventCallback },
   { (char*)"triggerEvent", (char*)"(JLjava/lang/String;[J)V", (void*)JniTriggerEvent },

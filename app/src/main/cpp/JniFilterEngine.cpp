@@ -46,24 +46,6 @@ static AdblockPlus::FilterEngine::ContentType ConvertContentType(JNIEnv *env,
   return AdblockPlus::FilterEngine::StringToContentType(value);
 }
 
-//TODO: test
-///////
-static jlong JNICALL JniCtor(JNIEnv* env, jclass clazz, jlong enginePtr)
-{
-  try
-  {
-    AdblockPlus::JsEnginePtr& jsEngine = *JniLongToTypePtr<AdblockPlus::JsEnginePtr>(enginePtr);
-    return JniPtrToLong(new AdblockPlus::FilterEngine(jsEngine));
-  }
-  CATCH_THROW_AND_RETURN(env, 0)
-}
-
-static void JNICALL JniDtor(JNIEnv* env, jclass clazz, jlong ptr)
-{
-  delete JniLongToTypePtr<AdblockPlus::FilterEngine>(ptr);
-}
-
-////////////////
 namespace
 {
   AdblockPlus::FilterEngine& GetFilterEngineRef(jlong jniPlatformPtr)
@@ -529,10 +511,6 @@ static jlong JNICALL JniGetFilterEngineNativePtr(JNIEnv* env, jclass clazz, jlon
 
 static JNINativeMethod methods[] =
 {
-  { (char*)"ctor", (char*)"(J)J", (void*)JniCtor },
-  { (char*)"dtor", (char*)"(J)V", (void*)JniDtor },
-
-
   { (char*)"isFirstRun", (char*)"(J)Z", (void*)JniIsFirstRun },
   { (char*)"getFilter", (char*)"(JLjava/lang/String;)" TYP("Filter"), (void*)JniGetFilter },
   { (char*)"getListedFilters", (char*)"(J)Ljava/util/List;", (void*)JniGetListedFilters },

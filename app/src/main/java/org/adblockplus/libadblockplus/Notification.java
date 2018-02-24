@@ -61,6 +61,7 @@ public class Notification extends JsValue {
     public static enum Type {
         INFORMATION,
         QUESTION,
+        RELENTLESS,
         CRITICAL,
         INVALID
     }

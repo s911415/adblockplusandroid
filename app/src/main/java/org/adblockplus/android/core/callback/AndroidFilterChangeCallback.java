@@ -18,10 +18,9 @@
 package org.adblockplus.android.core.callback;
 
 import android.content.Context;
-import org.adblockplus.android.Utils;
+import org.adblockplus.android.AdblockPlus;
 import org.adblockplus.libadblockplus.FilterChangeCallback;
 import org.adblockplus.libadblockplus.JsValue;
-import org.adblockplus.libadblockplus.Subscription;
 
 public class AndroidFilterChangeCallback extends FilterChangeCallback {
     private final Context context;
@@ -33,9 +32,12 @@ public class AndroidFilterChangeCallback extends FilterChangeCallback {
     @Override
     public void filterChangeCallback(final String action, final JsValue jsValue) {
         if (action.equals("subscription.lastDownload") || action.equals("subscription.downloadStatus")) {
-            final Subscription sub = new Subscription(jsValue);
-
-            Utils.updateSubscriptionStatus(this.context, sub);
+            JsValue url = jsValue.getProperty("url");
+            try {
+                AdblockPlus.getApplication().updateSubscriptionStatus(url.toString());
+            } finally {
+                url.dispose();
+            }
         }
     }
 }

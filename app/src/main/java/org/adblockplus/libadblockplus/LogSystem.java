@@ -17,47 +17,10 @@
 
 package org.adblockplus.libadblockplus;
 
-public abstract class LogSystem implements Disposable {
-    static {
-        System.loadLibrary("adblockplus-jni");
-        registerNatives();
-    }
+public interface LogSystem {
+    void logCallback(LogLevel level, String message, String source);
 
-    protected final long ptr;
-    private final Disposer disposer;
-
-    public LogSystem() {
-        this.ptr = ctor(this);
-        this.disposer = new Disposer(this, new DisposeWrapper(this.ptr));
-    }
-
-    private final static native void registerNatives();
-
-    private final static native long ctor(Object callbackObject);
-
-    private final static native void dtor(long ptr);
-
-    public abstract void logCallback(LogLevel level, String message, String source);
-
-    @Override
-    public void dispose() {
-        this.disposer.dispose();
-    }
-
-    public static enum LogLevel {
+    enum LogLevel {
         TRACE, LOG, INFO, WARN, ERROR;
-    }
-
-    private final static class DisposeWrapper implements Disposable {
-        private final long ptr;
-
-        public DisposeWrapper(final long ptr) {
-            this.ptr = ptr;
-        }
-
-        @Override
-        public void dispose() {
-            dtor(this.ptr);
-        }
     }
 }

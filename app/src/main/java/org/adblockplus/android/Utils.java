@@ -105,6 +105,9 @@ public final class Utils {
                 .putExtra("time", time * 1000L));
     }
 
+    public static void updateSubscriptionStatus(final Context context, final String subUrl) {
+    }
+
     public static void appendRawTextFile(final Context context, final StringBuilder text, final int id) {
         try {
             final BufferedReader buf = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(id)));

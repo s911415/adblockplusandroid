@@ -130,7 +130,7 @@ public class AdvancedPreferences extends SummarizedPreferences {
                 // If disabled, disable filtering as well
                 final SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(getString(R.string.pref_enabled), false);
-                editor.commit();
+                editor.apply();
                 application.setFilteringEnabled(false);
             }
         }

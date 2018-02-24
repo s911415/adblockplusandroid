@@ -34,12 +34,17 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
-import org.adblockplus.android.core.ABPEngine;
-import org.adblockplus.android.core.ReferrerMapping;
-import org.adblockplus.android.core.Subscription;
 import org.adblockplus.android.activity.dialog.CrashReportDialog;
+import org.adblockplus.android.core.ReferrerMapping;
+import org.adblockplus.android.core.callback.AndroidFilterChangeCallback;
+import org.adblockplus.android.core.callback.AndroidShowNotificationCallback;
+import org.adblockplus.android.core.callback.AndroidUpdateAvailableCallback;
+import org.adblockplus.android.core.callback.AndroidUpdateCheckDoneCallback;
 import org.adblockplus.android.service.ProxyService;
+import org.adblockplus.libadblockplus.AppInfo;
 import org.adblockplus.libadblockplus.FilterEngine.ContentType;
+import org.adblockplus.libadblockplus.android.AdblockEngine;
+import org.adblockplus.libadblockplus.android.Subscription;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
@@ -77,7 +82,7 @@ public class AdblockPlus extends Application {
      * Indicates whether filtering is enabled or not.
      */
     private boolean filteringEnabled = false;
-    private ABPEngine abpEngine;
+    private AdblockEngine abpEngine;
 
     /**
      * Returns pointer to itself (singleton pattern).
@@ -201,7 +206,9 @@ public class AdblockPlus extends Application {
      * Forces subscriptions refresh.
      */
     public void refreshSubscriptions() {
-        abpEngine.refreshSubscriptions();
+        for (final org.adblockplus.libadblockplus.Subscription s : abpEngine.getFilterEngine().getListedSubscriptions()) {
+            s.updateFilters();
+        }
     }
 
     /**
@@ -210,7 +217,10 @@ public class AdblockPlus extends Application {
      * @param url Subscription url
      */
     public void updateSubscriptionStatus(final String url) {
-        abpEngine.updateSubscriptionStatus(url);
+        final org.adblockplus.libadblockplus.Subscription sub = abpEngine.getFilterEngine().getSubscription(url);
+        if (sub != null) {
+            Utils.updateSubscriptionStatus(this, sub);
+        }
     }
 
     /**
@@ -235,23 +245,23 @@ public class AdblockPlus extends Application {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         final Editor editor = preferences.edit();
         editor.putBoolean("notified_about_acceptable_ads", notified);
-        editor.commit();
+        editor.apply();
     }
 
     /**
      * Returns ElemHide selectors for the supplied URL.
      *
-     * @param url The URL
+     * @param domain The domain
      * @return A list of CSS selectors
      */
-    public String[] getSelectorsForDomain(final String url, String referrer) {
+    public String[] getSelectorsForDomain(final String domain, String referrer) {
         if (this.abpEngine.isElemhideEnabled() && this.filteringEnabled) {
             if (referrer != null) {
-                this.referrerMapping.add(url, referrer);
+                this.referrerMapping.add(domain, referrer);
             }
             final List<String> referrerChain = this.referrerMapping.buildReferrerChain(referrer);
             final String[] referrerChainArray = referrerChain.toArray(new String[referrerChain.size()]);
-            final List<String> selectors = this.abpEngine.getElementHidingSelectors(url, referrerChainArray);
+            final List<String> selectors = this.abpEngine.getElementHidingSelectors(domain, domain, referrerChainArray);
             // We're returning 'null' when no selectors are available to be consistent
             // with the previous implementation
             return selectors.isEmpty() ? null : selectors.toArray(new String[selectors.size()]);
@@ -343,9 +353,23 @@ public class AdblockPlus extends Application {
     public void startEngine() {
         if (abpEngine == null) {
             final File basePath = getFilesDir();
-            abpEngine = ABPEngine.create(AdblockPlus.getApplication(), ABPEngine.generateAppInfo(this), basePath.getAbsolutePath());
+            AppInfo appInfo = AdblockEngine.generateAppInfo(this, BuildConfig.DEBUG);
+            abpEngine = create(this, appInfo, basePath.getAbsolutePath(), true);
         }
     }
+
+    private static AdblockEngine create(final Context context, final AppInfo appInfo, final String basePath, boolean enableElemhide) {
+        final AdblockEngine engine = AdblockEngine.builder(appInfo, basePath)
+                .enableElementHiding(enableElemhide)
+                .setUpdateAvailableCallback(new AndroidUpdateAvailableCallback(context))
+                .setFilterChangeCallback(new AndroidFilterChangeCallback(context))
+                .setUpdateCheckDoneCallback(new AndroidUpdateCheckDoneCallback(context))
+                .setShowNotificationCallback(new AndroidShowNotificationCallback(context))
+                .build();
+
+        return engine;
+    }
+
 
     /**
      * Stops ABP engine.

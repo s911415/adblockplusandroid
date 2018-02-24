@@ -23,17 +23,11 @@ public final class Filter extends JsValue {
         registerNatives();
     }
 
-    public Filter(final JsValue jsValue) {
-        super(ctor(jsValue.ptr));
-    }
-
     private Filter(final long pointer) {
         super(pointer);
     }
 
     private final static native void registerNatives();
-
-    private final static native long ctor(long jsValuePtr);
 
     private final static native Type getType(long ptr);
 
@@ -76,6 +70,7 @@ public final class Filter extends JsValue {
     }
 
     public static enum Type {
-        BLOCKING, EXCEPTION, ELEMHIDE, ELEMHIDE_EXCEPTION, COMMENT, INVALID;
+        BLOCKING, EXCEPTION, ELEMHIDE, ELEMHIDE_EXCEPTION, ELEMHIDE_EMULATION,
+        COMMENT, INVALID;
     }
 }
