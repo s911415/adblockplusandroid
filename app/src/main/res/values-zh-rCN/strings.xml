@@ -5,6 +5,9 @@
   <string name="crash_name">发生崩溃</string>
   <string name="configuration_name">配置信息</string>
   <string name="proxysettings_name">代理配置</string>
+  <string name="install_name">Adblock Plus 已安装完成</string>
+  <string name="acceptableads_name">Adblock Plus 中的非侵入式广告</string>
+  <string name="msg_acceptable_ads">Adblock Plus 现在支援 &lt;a&gt;非侵入式广告&lt;/a&gt;, 并已自动启用。您可以在设定中选择停用。</string>
   <string name="notif_wifi">拦截经由WiFi连接的广告</string>
   <string name="notif_wifi_nofiltering">以WiFi方式连接时允许广告</string>
   <string name="notif_all">拦截经由所有连接的广告</string>
@@ -81,4 +84,7 @@
   <string name="pref_checkupdate_title">检查更新</string>
   <string name="pref_configuration_title">显示配置</string>
   <string name="menu_advanced">高级设置</string>
+  <string name="pref_acceptableads_title">可接受的广告</string>
+  <string name="pref_acceptableads_summary_on">允许一些非侵入性的广告</string>
+  <string name="pref_acceptableads_summary_off">阻止所有广告</string>
 </resources>

@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
+    lintOptions {
+        checkReleaseBuilds false
+    }
+
     compileSdkVersion 26
     buildToolsVersion "27.0.3"
     defaultConfig {
@@ -12,17 +16,6 @@ android {
         ndk {
             abiFilters 'armeabi-v7a', 'x86'
         }
-
-//        externalNativeBuild {
-//            cmake {
-//                arguments '-DBUILD_TESTING=OFF','-DANDROID_TOOLCHAIN=gcc'
-//            }
-//        }
-//        externalNativeBuild {
-//            cmake {
-//                arguments "-DANDROID_TOOLCHAIN=gcc"
-//            }
-//        }
     }
 
     buildTypes {
@@ -31,19 +24,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-//    externalNativeBuild {
-//        ndkBuild {
-//            path "src/main/jni/Android.mk"
-//        }
-//    }
-
-//    externalNativeBuild {
-//        cmake {
-//            path "CMakeLists.txt"
-//        }
-//    }
-
     useLibrary 'org.apache.http.legacy'
 }
 
@@ -53,5 +33,5 @@ dependencies {
     //compile(name: 'root-tools-5.0', ext: 'aar')
     //compile(name: 'libadblockplus-android-abi_all-release', ext: 'aar')
     compile 'com.android.support:appcompat-v7:26.+'
-
+    compile 'com.android.support:design:26+'
 }

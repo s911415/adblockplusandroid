@@ -37,6 +37,7 @@
   <string name="configuring_proxy_url">https://adblockplus.org/en/android-config#proxy</string>
 
   <string name="ok">OK</string>
+  <string name="finish" translatable="false">Finish</string>
   <string name="cancel">Cancel</string>
   <string name="error">Error</string>
   <string name="warning">Warning</string>
@@ -90,5 +91,5 @@
   <string name="pref_checkupdate_title">Check for update</string>
   <string name="pref_configuration_title">Show configuration</string>
   <string name="menu_advanced">Advanced settings</string>
-
+  <string name="menu_ref_script" translatable="false">Refresh Script</string>
 </resources>

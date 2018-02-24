@@ -153,7 +153,7 @@ public class RequestHandler extends BaseRequestHandler {
         if (url.startsWith("http://254.235.252.251")) {
             request.keepAlive = false;
             byte[] content = AdblockPlus.getApplication().getInjectContent();
-            if (content!=null && url.endsWith("/__script.js")) {
+            if (content != null && url.endsWith("/__script.js")) {
                 request.responseHeaders.add("Via", "Inject");
                 request.responseHeaders.add("Connection", "close");
                 request.responseHeaders.add("Access-Control-Allow-Origin", "*");
@@ -267,10 +267,10 @@ public class RequestHandler extends BaseRequestHandler {
                 String charsetName = "utf-8";
                 final String contentType = request.responseHeaders.get("Content-Type");
                 if (contentType != null) {
-                    final Matcher matcher = Pattern.compile("charset=([^;]*)").matcher(contentType);
+                    final Matcher matcher = Pattern.compile(".+;(\\s+)?charset=([^;]*)", Pattern.CASE_INSENSITIVE).matcher(contentType);
                     if (matcher.matches()) {
                         try {
-                            final String extractedCharsetName = matcher.group(0);
+                            final String extractedCharsetName = matcher.group(2);
                             Charset.forName(extractedCharsetName);
                             charsetName = extractedCharsetName;
                         } catch (final IllegalArgumentException e) {
@@ -285,7 +285,8 @@ public class RequestHandler extends BaseRequestHandler {
 
                 //boolean sent = selectors == null;
                 boolean sent = false;
-                final BoyerMoore matcher = new BoyerMoore("<html".getBytes());
+                final BoyerMoore matcher1 = new BoyerMoore("<html".getBytes());
+                final BoyerMoore matcher2 = new BoyerMoore("<HTML".getBytes());
 
                 while (size > 0) {
                     out.flush();
@@ -298,7 +299,10 @@ public class RequestHandler extends BaseRequestHandler {
                     try {
                         // Search for <html> tag
                         if (!sent && count > 0) {
-                            final List<Integer> matches = matcher.match(buf, 0, count);
+                            final List<Integer> matches = matcher1.match(buf, 0, count);
+                            if (matches.isEmpty()) {
+                                matches.addAll(matcher2.match(buf, 0, count));
+                            }
                             if (!matches.isEmpty()) {
                                 // Add filters right before match
                                 final int m = matches.get(0);

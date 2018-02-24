@@ -18,5 +18,10 @@
         android:icon="@drawable/ic_menu_preferences"
         android:title="@string/menu_advanced">
     </item>
+    <item
+        android:id="@+id/ref_script"
+        android:icon="@drawable/ic_menu_refresh"
+        android:title="@string/menu_ref_script">
+    </item>
 
 </menu>

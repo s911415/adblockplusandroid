@@ -29,6 +29,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.Html;
 import android.text.SpannableString;
@@ -39,7 +40,10 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.*;
 import android.widget.TextView;
-import org.adblockplus.android.*;
+import android.widget.Toast;
+import org.adblockplus.android.AdblockPlus;
+import org.adblockplus.android.R;
+import org.adblockplus.android.Utils;
 import org.adblockplus.android.activity.ProxyConfigurationActivity;
 import org.adblockplus.android.activity.dialog.AboutDialog;
 import org.adblockplus.android.service.ProxyService;
@@ -298,6 +302,10 @@ public class Preferences extends SummarizedPreferences {
                 return true;
             case R.id.menu_advanced:
                 startActivity(new Intent(this, AdvancedPreferences.class));
+                return true;
+            case R.id.ref_script:
+                Snackbar.make(this.findViewById(android.R.id.content), R.string.finish, Snackbar.LENGTH_SHORT).show();
+                AdblockPlus.getApplication().refreshInjectionFile();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

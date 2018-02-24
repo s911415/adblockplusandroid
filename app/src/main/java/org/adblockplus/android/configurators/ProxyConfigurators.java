@@ -41,7 +41,7 @@ public final class ProxyConfigurators {
          *
          * Note: order of adding is important (as later added configurators act as fallbacks for earlier ones).
          */
-        add(CyanogenProxyConfigurator.class);
+        // add(CyanogenProxyConfigurator.class);
         add(IptablesProxyConfigurator.class);
         add(NativeProxyConfigurator.class);
         add(ManualProxyConfigurator.class);

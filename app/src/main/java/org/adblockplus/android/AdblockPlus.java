@@ -371,6 +371,11 @@ public class AdblockPlus extends Application {
         initInjectionFile(getExternalFilesDir("scripts"));
     }
 
+    public void refreshInjectionFile() {
+        injectContent = null;
+        initInjectionFile();
+    }
+
     private void initInjectionFile(File basePath) {
         File inject = new File(basePath, "script.js");
         if (!inject.exists()) {

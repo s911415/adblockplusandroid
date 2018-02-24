@@ -48,7 +48,6 @@ public interface ProxyConfigurator {
     /**
      * Shuts down this configurator, normally called on application exit to perform any clean up.
      *
-     * @param context Service/Application context
      */
     public void shutdown();
 

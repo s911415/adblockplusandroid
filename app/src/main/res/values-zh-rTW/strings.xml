@@ -32,6 +32,7 @@
   <string name="configuring_url">https://adblockplus.org/zh_TW/android-config</string>
   <string name="configuring_proxy_url">https://adblockplus.org/zh_TW/android-config#proxy</string>
   <string name="ok">確定</string>
+  <string name="finish" translatable="false">完成</string>
   <string name="cancel">取消</string>
   <string name="error">錯誤</string>
   <string name="warning">警告</string>
