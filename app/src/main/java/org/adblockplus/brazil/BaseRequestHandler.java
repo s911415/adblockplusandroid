@@ -17,75 +17,65 @@
 
 package org.adblockplus.brazil;
 
-import java.util.Properties;
-
 import sunlabs.brazil.server.Handler;
 import sunlabs.brazil.server.Request;
 import sunlabs.brazil.server.Server;
 import sunlabs.brazil.util.http.MimeHeaders;
 
-public abstract class BaseRequestHandler implements Handler
-{
+import java.util.Properties;
 
-  public static final String PROXY_HOST = "proxyHost";
-  public static final String PROXY_PORT = "proxyPort";
-  public static final String AUTH = "auth";
-  protected String proxyHost;
-  protected int proxyPort = 80;
-  protected String auth;
-  protected boolean shouldLogHeaders;
+public abstract class BaseRequestHandler implements Handler {
 
-  protected String prefix;
+    public static final String PROXY_HOST = "proxyHost";
+    public static final String PROXY_PORT = "proxyPort";
+    public static final String AUTH = "auth";
+    protected String proxyHost;
+    protected int proxyPort = 80;
+    protected String auth;
+    protected boolean shouldLogHeaders;
 
-  @Override
-  public boolean init(final Server server, final String prefix)
-  {
-    this.prefix = prefix;
+    protected String prefix;
 
-    final Properties props = server.props;
+    /**
+     * Dump the headers on stderr
+     */
+    public static String dumpHeaders(final int count, final Request request, final MimeHeaders headers, final boolean sent) {
+        String prompt;
+        final StringBuffer sb = new StringBuffer();
+        String label = "   " + count;
+        label = label.substring(label.length() - 4);
+        if (sent) {
+            prompt = label + "> ";
+            sb.append(prompt).append(request.toString()).append("\n");
+        } else {
+            prompt = label + "< ";
+        }
 
-    proxyHost = props.getProperty(prefix + PROXY_HOST);
-
-    final String s = props.getProperty(prefix + PROXY_PORT);
-    try
-    {
-      proxyPort = Integer.decode(s).intValue();
-    }
-    catch (final Exception e)
-    {
-    }
-
-    auth = props.getProperty(prefix + AUTH);
-
-    shouldLogHeaders = (server.props.getProperty(prefix + "proxylog") != null);
-
-    return true;
-  }
-
-  /**
-   * Dump the headers on stderr
-   */
-  public static String dumpHeaders(final int count, final Request request, final MimeHeaders headers, final boolean sent)
-  {
-    String prompt;
-    final StringBuffer sb = new StringBuffer();
-    String label = "   " + count;
-    label = label.substring(label.length() - 4);
-    if (sent)
-    {
-      prompt = label + "> ";
-      sb.append(prompt).append(request.toString()).append("\n");
-    }
-    else
-    {
-      prompt = label + "< ";
+        for (int i = 0; i < headers.size(); i++) {
+            sb.append(prompt).append(headers.getKey(i));
+            sb.append(": ").append(headers.get(i)).append("\n");
+        }
+        return (sb.toString());
     }
 
-    for (int i = 0; i < headers.size(); i++)
-    {
-      sb.append(prompt).append(headers.getKey(i));
-      sb.append(": ").append(headers.get(i)).append("\n");
+    @Override
+    public boolean init(final Server server, final String prefix) {
+        this.prefix = prefix;
+
+        final Properties props = server.props;
+
+        proxyHost = props.getProperty(prefix + PROXY_HOST);
+
+        final String s = props.getProperty(prefix + PROXY_PORT);
+        try {
+            proxyPort = Integer.decode(s).intValue();
+        } catch (final Exception e) {
+        }
+
+        auth = props.getProperty(prefix + AUTH);
+
+        shouldLogHeaders = (server.props.getProperty(prefix + "proxylog") != null);
+
+        return true;
     }
-    return (sb.toString());
-  }
 }

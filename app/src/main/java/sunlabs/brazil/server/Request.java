@@ -437,11 +437,11 @@ import java.util.StringTokenizer;
  * data fields are meant to be accessed for more complicated operations,
  * such as changing the URL or deleting HTTP response headers.
  *
- * @see        Handler
- * @see        Server
  * @author Stephen Uhler (stephen.uhler@sun.com)
  * @author Colin Stevens (colin.stevens@sun.com)
  * @version 2.11
+ * @see Handler
+ * @see Server
  */
 public class Request {
     /**
@@ -509,26 +509,17 @@ public class Request {
      * does not need this functionality, this variable may be accessed
      * simply as a normal <code>OutputStream</code>.
      *
-     * @see    #sendResponse(String, String, int)
-     * @see    #sendHeaders(int, String, int)
+     * @see #sendResponse(String, String, int)
+     * @see #sendHeaders(int, String, int)
      */
     public HttpOutputStream out;
-
-    /*
-     * How many requests this <code>Request</code> will handle.  If this goes
-     * to 0, then the connection will be closed even if
-     * <code>keepAlive</code> is true.
-     */
-    protected int requestsLeft;
-
-
-    //-----------------------------------------------------------------------
-
     /**
      * The HTTP request method, such as "GET", "POST", or "PUT".
      */
     public String method;
 
+
+    //-----------------------------------------------------------------------
     /**
      * The URL specified in the request, not including any "?" query
      * string.
@@ -538,28 +529,24 @@ public class Request {
      * url is required.
      */
     public String url;
-
     /**
      * The query string specified after the URL, or <code>""</code> if no
      * query string was specified.
      */
     public String query;
-
     /**
      * The HTTP protocol specified in the request, either "HTTP/1.0" or
      * "HTTP/1.1".
      *
-     * @see    #version
+     * @see #version
      */
     public String protocol;
-
     /**
      * Derived from {@link #protocol}, the version of the HTTP protocol
      * used for this request.  Either <code>10</code> for "HTTP/1.0" or
      * <code>11</code> for "HTTP/1.1".
      */
     public int version;
-
     /**
      * The HTTP request headers.  Keys and values in this table correspond
      * the field names and values from each line in the HTTP header;
@@ -569,13 +556,11 @@ public class Request {
      * with the same key are stored as separate entries in the table.
      */
     public MimeHeaders headers;
-
     /**
      * The uploaded content of this request, usually from a POST.  Set to
      * <code>null</code> if the request has no content.
      */
     public byte[] postData;
-
     /**
      * <code>true</code> if the client requested a persistent connection,
      * <code>false</code> otherwise.  Derived from the {@link #protocol} and
@@ -599,7 +584,6 @@ public class Request {
      * or responding to an HTTP request, the connection will be closed.
      */
     public boolean keepAlive;
-
     /**
      * The header "Connection" usually controls whether the client
      * connection will be of type "Keep-Alive" or "close".  The same
@@ -620,7 +604,6 @@ public class Request {
      * all the exceptions to the specification is a "slippery slope".
      */
     public String connectionHeader;
-
     /**
      * This is the server's protocol.  It is normally null, but
      * may be overriden to change the protocol on a per-request
@@ -628,12 +611,6 @@ public class Request {
      */
 
     public String serverProtocol;
-
-    //-----------------------------------------------------------------------
-
-    protected int statusCode;
-    protected String statusPhrase;
-
     /**
      * The HTTP response headers.  Keys and values in this table correspond
      * to the HTTP headers that will be written back to the client when
@@ -642,10 +619,23 @@ public class Request {
      * lines with the same key will be stored as separate entries in the
      * table.
      *
-     * @see    #addHeader(String, String)
+     * @see #addHeader(String, String)
      */
     public MimeHeaders responseHeaders;
 
+    //-----------------------------------------------------------------------
+    /**
+     * Time stamp for start of this request - set, but not used.
+     */
+    public long startMillis;
+    /*
+     * How many requests this <code>Request</code> will handle.  If this goes
+     * to 0, then the connection will be closed even if
+     * <code>keepAlive</code> is true.
+     */
+    protected int requestsLeft;
+    protected int statusCode;
+    protected String statusPhrase;
     /*
      * True if the headers have already been sent, so that if sendError()
      * is called in the middle of sending a response, it won't send the
@@ -654,16 +644,11 @@ public class Request {
     protected boolean headersSent;
 
     /**
-     * Time stamp for start of this request - set, but not used.
-     */
-    public long startMillis;
-
-    /**
      * Create a new http request.  Requests are created by the server for
      * use by handlers.
      *
-     * @param    server The server that owns this request.
-     * @param    sock The socket of the incoming HTTP request.
+     * @param server The server that owns this request.
+     * @param sock   The socket of the incoming HTTP request.
      */
     protected Request(Server server, Socket sock) {
         this.server = server;
@@ -722,11 +707,11 @@ public class Request {
     /**
      * Reads an HTTP request from the socket.
      *
-     * @return    <code>true</code> if the request was successfully read and
+     * @return <code>true</code> if the request was successfully read and
      * parsed, <code>false</code> if the request was malformed.
      * @throws IOException if there was an IOException reading from the socket.  See
-     * the socket documentation for a description of socket
-     * exceptions.
+     *                     the socket documentation for a description of socket
+     *                     exceptions.
      */
     public boolean
     getRequest()
@@ -911,9 +896,9 @@ public class Request {
      * message is generated on the console or in a log file, if the
      * <code>level</code> is less than the current server log setting.
      *
-     * @param    level The severity of the message.
-     * @param    message The message that will be logged.
-     * @see    Server#log(int, Object, String)
+     * @param level   The severity of the message.
+     * @param message The message that will be logged.
+     * @see Server#log(int, Object, String)
      */
     public void
     log(int level, String message) {
@@ -925,10 +910,10 @@ public class Request {
      * message is generated on the console or in a log file, if the
      * <code>level</code> is less than the current server log setting.
      *
-     * @param    level The severity of the message.
-     * @param    obj The object that the message relates to.
-     * @param    message The message that will be logged.
-     * @see    Server#log(int, Object, String)
+     * @param level   The severity of the message.
+     * @param obj     The object that the message relates to.
+     * @param message The message that will be logged.
+     * @see Server#log(int, Object, String)
      */
     public void
     log(int level, Object obj, String message) {
@@ -947,11 +932,11 @@ public class Request {
      * changing or deleting an existing request header, the user may directly
      * access the <code>headers</code> field.
      *
-     * @param    key The key to look for in the HTTP request headers.  May not
-     * be <code>null</code>.
+     * @param key The key to look for in the HTTP request headers.  May not
+     *            be <code>null</code>.
      * @return The value to which the given key is mapped, or
      * <code>null</code> if the key is not in the headers.
-     * @see    #headers
+     * @see #headers
      */
     public String
     getRequestHeader(String key) {
@@ -1002,42 +987,17 @@ public class Request {
      */
 
     /**
-     * Sets the status code of the HTTP response.  The default status
-     * code for a response is <code>200</code> if this method is not
-     * called.
-     * <p>
-     * An HTTP status phrase will be chosen based on the given
-     * status code.  For example, the status code <code>404</code> will get
-     * the status phrase "Not Found".
-     * <p>
-     * If this method is called, it must be called before
-     * <code>sendHeaders</code> is either directly or indirectly called.
-     * Otherwise, it will have no effect.
-     *
-     * @param    code The HTTP status code, such as <code>200</code> or
-     * <code>404</code>.  If &lt; 0, the HTTP status code will
-     * not be changed.
-     * @see    #sendHeaders(int, String, int)
-     */
-    public void
-    setStatus(int code) {
-        if (code >= 0) {
-            setStatus(code, HttpUtil.getStatusPhrase(code));
-        }
-    }
-
-    /**
      * Set the HTTP status code and status phrase of this request.  The given
      * status will be sent to the client when the user directly or indirectly
      * calls the method <code>sendHeaders</code>.  The given status phrase
      * replaces the default HTTP status phrase normally associated with the
      * given status code.
      *
-     * @param    code The HTTP status code, such as <code>200</code> or
-     * <code>404</code>.
-     * @param    message The HTTP status phrase, such as <code>"Okey dokey"</code> or
-     * <code>"I don't see it"</code>.
-     * @see    #sendHeaders(int, String, int)
+     * @param code    The HTTP status code, such as <code>200</code> or
+     *                <code>404</code>.
+     * @param message The HTTP status phrase, such as <code>"Okey dokey"</code> or
+     *                <code>"I don't see it"</code>.
+     * @see #sendHeaders(int, String, int)
      */
     protected void
     setStatus(int code, String message) {
@@ -1051,6 +1011,31 @@ public class Request {
 
     public int getStatus() {
         return statusCode;
+    }
+
+    /**
+     * Sets the status code of the HTTP response.  The default status
+     * code for a response is <code>200</code> if this method is not
+     * called.
+     * <p>
+     * An HTTP status phrase will be chosen based on the given
+     * status code.  For example, the status code <code>404</code> will get
+     * the status phrase "Not Found".
+     * <p>
+     * If this method is called, it must be called before
+     * <code>sendHeaders</code> is either directly or indirectly called.
+     * Otherwise, it will have no effect.
+     *
+     * @param code The HTTP status code, such as <code>200</code> or
+     *             <code>404</code>.  If &lt; 0, the HTTP status code will
+     *             not be changed.
+     * @see #sendHeaders(int, String, int)
+     */
+    public void
+    setStatus(int code) {
+        if (code >= 0) {
+            setStatus(code, HttpUtil.getStatusPhrase(code));
+        }
     }
 
     /**
@@ -1070,10 +1055,10 @@ public class Request {
      * <code>sendHeaders</code> is either directly or indirectly called.
      * Otherwise, it will have no effect.
      *
-     * @param    key The header name.
-     * @param    value The value for the request header.
-     * @see    #sendHeaders(int, String, int)
-     * @see    #responseHeaders
+     * @param key   The header name.
+     * @param value The value for the request header.
+     * @see #sendHeaders(int, String, int)
+     * @see #responseHeaders
      */
     public void
     addHeader(String key, String value) {
@@ -1089,10 +1074,10 @@ public class Request {
      * <code>sendHeaders</code> is either directly or indirectly called.
      * Otherwise, it will have no effect.
      *
-     * @param    line The HTTP response header, of the form
-     * "<code>key</code>: <code>value</code>".
-     * @see    #sendHeaders(int, String, int)
-     * @see    #responseHeaders
+     * @param line The HTTP response header, of the form
+     *             "<code>key</code>: <code>value</code>".
+     * @see #sendHeaders(int, String, int)
+     * @see #responseHeaders
      */
     public void
     addHeader(String line) {
@@ -1113,14 +1098,14 @@ public class Request {
      * The "Content-Length" will be set to the length of the given byte array.
      * The "Content-Type" will be set to the given MIME type.
      *
-     * @param    body The array of bytes to send as the HTTP response body.  May
-     * not be <code>null</code>.
-     * @param    type The MIME type of the response, such as "text/html".  May be
-     * <code>null</code> to use the existing "Content-Type"
-     * response header (if any).
+     * @param body The array of bytes to send as the HTTP response body.  May
+     *             not be <code>null</code>.
+     * @param type The MIME type of the response, such as "text/html".  May be
+     *             <code>null</code> to use the existing "Content-Type"
+     *             response header (if any).
      * @throws IOException if there was an I/O error while sending the response to
-     * the client.
-     * @see    #sendHeaders(int, String, int)
+     *                     the client.
+     * @see #sendHeaders(int, String, int)
      */
     public void
     sendResponse(byte[] body, String type)
@@ -1149,18 +1134,18 @@ public class Request {
      * Note: to use a different character encoding, use
      * <code>sendResponse(body.getBytes(encoding)...)</code> instead.
      *
-     * @param    body The string to send as the HTTP response body.  May
-     * not be <code>null</code>. If the request method is HEAD,
-     * the body is not sent.
-     * @param    type The MIME type of the response, such as "text/html".  May be
-     * <code>null</code> to preserve the existing "Content-Type"
-     * response header (if any).
-     * @param    code The HTTP status code for the response, such as
-     * <code>200</code>.  May be &lt; 0 to preserve the existing
-     * status code.
+     * @param body The string to send as the HTTP response body.  May
+     *             not be <code>null</code>. If the request method is HEAD,
+     *             the body is not sent.
+     * @param type The MIME type of the response, such as "text/html".  May be
+     *             <code>null</code> to preserve the existing "Content-Type"
+     *             response header (if any).
+     * @param code The HTTP status code for the response, such as
+     *             <code>200</code>.  May be &lt; 0 to preserve the existing
+     *             status code.
      * @throws IOException if there was an I/O error while sending the response to
-     * the client.
-     * @see    #sendHeaders(int, String, int)
+     *                     the client.
+     * @see #sendHeaders(int, String, int)
      */
     public void
     sendResponse(String body, String type, int code)
@@ -1180,8 +1165,8 @@ public class Request {
      * with a "Content-Type" of "text/html" and the default HTTP status
      * code.
      *
-     * @param    body The string to send as the HTTP response body.
-     * @see    #sendResponse(String, String, int)
+     * @param body The string to send as the HTTP response body.
+     * @see #sendResponse(String, String, int)
      */
     public void
     sendResponse(String body)
@@ -1193,11 +1178,11 @@ public class Request {
      * Convenience method that sends an HTTP response to the client
      * with the default HTTP status code.
      *
-     * @param    body The string to send as the HTTP response body.
-     * If the request method is HEAD,
-     * only the headers are sent to the client.
-     * @param    type The MIME type of the response.
-     * @see    #sendResponse(String, String, int)
+     * @param body The string to send as the HTTP response body.
+     *             If the request method is HEAD,
+     *             only the headers are sent to the client.
+     * @param type The MIME type of the response.
+     * @see #sendResponse(String, String, int)
      */
     public void
     sendResponse(String body, String type)
@@ -1221,18 +1206,18 @@ public class Request {
      * before returning, if fewer than <code>length</code> bytes could be
      * read. If the request method is HEAD, only the headers are sent.
      *
-     * @param    in The input stream to read from.
-     * @param    length The content length.  The number of bytes to send to the
-     * client.  May be &lt; 0, in which case this method will read
-     * until reaching the end of the input stream.
-     * @param    type The MIME type of the response, such as "text/html".  May be
-     * <code>null</code> to preserve the existing "Content-Type"
-     * response header (if any).
-     * @param    code The HTTP status code for the response, such as
-     * <code>200</code>.  May be &lt; 0 to preserve the existing
-     * status code.
+     * @param in     The input stream to read from.
+     * @param length The content length.  The number of bytes to send to the
+     *               client.  May be &lt; 0, in which case this method will read
+     *               until reaching the end of the input stream.
+     * @param type   The MIME type of the response, such as "text/html".  May be
+     *               <code>null</code> to preserve the existing "Content-Type"
+     *               response header (if any).
+     * @param code   The HTTP status code for the response, such as
+     *               <code>200</code>.  May be &lt; 0 to preserve the existing
+     *               status code.
      * @throws IOException if there was an I/O error while sending the response to
-     * the client.
+     *                     the client.
      */
     public void
     sendResponse(InputStream in, int length, String type, int code)
@@ -1279,9 +1264,9 @@ public class Request {
     /**
      * Sends a HTTP error response to the client.
      *
-     * @param    code The HTTP status code.
-     * @param    clientMessage A short message to be included in the error response
-     * and logged to the server.
+     * @param code          The HTTP status code.
+     * @param clientMessage A short message to be included in the error response
+     *                      and logged to the server.
      */
     public void
     sendError(int code, String clientMessage) {
@@ -1291,10 +1276,10 @@ public class Request {
     /**
      * Sends a HTTP error response to the client.
      *
-     * @param    code The HTTP status code.
-     * @param    clientMessage A short message to be included in the error response.
-     * @param    logMessage A short message to be logged to the server.  This message is
-     * <b>not</b> sent to the client.
+     * @param code          The HTTP status code.
+     * @param clientMessage A short message to be included in the error response.
+     * @param logMessage    A short message to be logged to the server.  This message is
+     *                      <b>not</b> sent to the client.
      */
     public void
     sendError(int code, String clientMessage, String logMessage) {
@@ -1367,21 +1352,21 @@ public class Request {
      * The string used for "Connection" header actually comes from the
      * <code>connectionHeader</code> field.
      *
-     * @param    code The HTTP status code for the response, such as
-     * <code>200</code>.  May be &lt; 0 to preserve the existing
-     * status code.
-     * @param    type The MIME type of the response, such as "text/html".  May be
-     * <code>null</code> to preserve the existing "Content-Type"
-     * response header (if any).
-     * @param    length The length of the response body.  May be &lt; 0 if the length
-     * is unknown and/or to preserve the existing "Content-Length"
-     * response header (if any).
+     * @param code   The HTTP status code for the response, such as
+     *               <code>200</code>.  May be &lt; 0 to preserve the existing
+     *               status code.
+     * @param type   The MIME type of the response, such as "text/html".  May be
+     *               <code>null</code> to preserve the existing "Content-Type"
+     *               response header (if any).
+     * @param length The length of the response body.  May be &lt; 0 if the length
+     *               is unknown and/or to preserve the existing "Content-Length"
+     *               response header (if any).
      * @throws IOException if there was an I/O error while sending the headers to
-     * the client.
-     * @see    #setStatus(int)
-     * @see    #addHeader(String, String)
-     * @see    #sendResponse(String, String, int)
-     * @see    #connectionHeader
+     *                     the client.
+     * @see #setStatus(int)
+     * @see #addHeader(String, String)
+     * @see #sendResponse(String, String, int)
+     * @see #connectionHeader
      */
     public void
     sendHeaders(int code, String type, int length)
@@ -1431,11 +1416,11 @@ public class Request {
      * client that the requested url has moved.  Generally, this is used if
      * the client did not put a '/' on the end of a directory.
      *
-     * @param    url The URL the client should have requested.  This URL may be
-     * fully-qualified (in the form "http://....") or host-relative
-     * (in the form "/...").
-     * @param    body The body of the redirect response, or <code>null</code> to
-     * send a hardcoded message.
+     * @param url  The URL the client should have requested.  This URL may be
+     *             fully-qualified (in the form "http://....") or host-relative
+     *             (in the form "/...").
+     * @param body The body of the redirect response, or <code>null</code> to
+     *             send a hardcoded message.
      */
     public void
     redirect(String url, String body)
@@ -1476,60 +1461,6 @@ public class Request {
             return serverProtocol + "://" + host;
         } else {
             return server.protocol + "://" + host;
-        }
-    }
-
-    /**
-     * The <code>HttpOutputStream</code> provides the convenience method
-     * <code>writeBytes</code> for writing the byte representation of a
-     * string, without bringing in the overhead and the deprecated warnings
-     * associated with a <code>java.io.DataOutputStream</code>.
-     * <p>
-     * The other methods in this class are here to allow the
-     * <code>FilterHandler</code> and <code>ChainSawHandler</code> to
-     * alter the behavior in an implementation specific way.  This behavior
-     * is unfortunate, and might go away when a better strategy comes along.
-     */
-    public static class HttpOutputStream
-            extends FilterOutputStream {
-        /**
-         * Count the number of bytes that are written to this stream
-         */
-
-        public int bytesWritten = 0;
-
-        public HttpOutputStream(OutputStream out) {
-            super(out);
-        }
-
-        public void
-        writeBytes(String s)
-                throws IOException {
-            int len = s.length();
-            for (int i = 0; i < len; i++) {
-                this.out.write((byte) s.charAt(i));
-            }
-            bytesWritten += len;
-        }
-
-        public void write(byte b) throws IOException {
-            this.out.write(b);
-            bytesWritten++;
-        }
-
-        public void
-        write(byte[] buf, int off, int len) throws IOException {
-            this.out.write(buf, off, len);
-            bytesWritten += len;
-        }
-
-        public void
-        sendHeaders(Request request)
-                throws IOException {
-            writeBytes(request.protocol + " " + request.statusCode + " " +
-                    request.statusPhrase + "\r\n");
-            request.responseHeaders.print(this.out);
-            writeBytes("\r\n");
         }
     }
 
@@ -1603,13 +1534,13 @@ public class Request {
      * fetch properties from an added <code>Dictionary</code>, but
      * <code>request.put()</code> will <b>not</b> modify those dictionaries.
      *
-     * @param    d A <code>Dictionary</code> of <code>String</code> key/value
-     * pairs that will be added to the chain searched
-     * when <code>request.props.getProperty()</code> is called.  The
-     * dictionary <code>d</code> is "live", meaning that external
-     * changes to the contents of <code>d</code> will be seen on
-     * subsequent calls to <code>request.props.getProperty()</code>.
-     * @return    <code>false</code> if the dictionary had already been added
+     * @param d A <code>Dictionary</code> of <code>String</code> key/value
+     *          pairs that will be added to the chain searched
+     *          when <code>request.props.getProperty()</code> is called.  The
+     *          dictionary <code>d</code> is "live", meaning that external
+     *          changes to the contents of <code>d</code> will be seen on
+     *          subsequent calls to <code>request.props.getProperty()</code>.
+     * @return <code>false</code> if the dictionary had already been added
      * by a previous call to this method, <code>true</code>
      * otherwise.
      */
@@ -1638,9 +1569,9 @@ public class Request {
      * to be removed; they will automatically get cleaned up at the end of
      * the request.
      *
-     * @param    d The <code>Dictionary</code> object to remove from the
-     * <code>request.props.getProperty()</code> search chain.
-     * @return    <code>true</code> if the <code>Dictionary</code> was found
+     * @param d The <code>Dictionary</code> object to remove from the
+     *          <code>request.props.getProperty()</code> search chain.
+     * @return <code>true</code> if the <code>Dictionary</code> was found
      * and removed, <code>false</code> if the <code>Dictionary</code>
      * was not found (it had already been removed or had never been
      * added).
@@ -1656,5 +1587,59 @@ public class Request {
             return true;
         }
         return false;
+    }
+
+    /**
+     * The <code>HttpOutputStream</code> provides the convenience method
+     * <code>writeBytes</code> for writing the byte representation of a
+     * string, without bringing in the overhead and the deprecated warnings
+     * associated with a <code>java.io.DataOutputStream</code>.
+     * <p>
+     * The other methods in this class are here to allow the
+     * <code>FilterHandler</code> and <code>ChainSawHandler</code> to
+     * alter the behavior in an implementation specific way.  This behavior
+     * is unfortunate, and might go away when a better strategy comes along.
+     */
+    public static class HttpOutputStream
+            extends FilterOutputStream {
+        /**
+         * Count the number of bytes that are written to this stream
+         */
+
+        public int bytesWritten = 0;
+
+        public HttpOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        public void
+        writeBytes(String s)
+                throws IOException {
+            int len = s.length();
+            for (int i = 0; i < len; i++) {
+                this.out.write((byte) s.charAt(i));
+            }
+            bytesWritten += len;
+        }
+
+        public void write(byte b) throws IOException {
+            this.out.write(b);
+            bytesWritten++;
+        }
+
+        public void
+        write(byte[] buf, int off, int len) throws IOException {
+            this.out.write(buf, off, len);
+            bytesWritten += len;
+        }
+
+        public void
+        sendHeaders(Request request)
+                throws IOException {
+            writeBytes(request.protocol + " " + request.statusCode + " " +
+                    request.statusPhrase + "\r\n");
+            request.responseHeaders.print(this.out);
+            writeBytes("\r\n");
+        }
     }
 }

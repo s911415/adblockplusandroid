@@ -2,22 +2,22 @@
  * MatchString.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 2001-2006 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: suhler.
  * Portions created by suhler are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): suhler.
  *
  * Version:  2.3
@@ -64,8 +64,7 @@
 package sunlabs.brazil.util;
 
 import sunlabs.brazil.util.regexp.Regexp;
-import sunlabs.brazil.util.Glob;
-import sunlabs.brazil.util.Format;
+
 import java.util.Properties;
 
 /**
@@ -82,7 +81,7 @@ import java.util.Properties;
  * <dd>The glob pattern the url must match. If defined, this
  * overrides both <code>prefix</code> and <code>suffix</code>.
  * <dt>match
- * <dd>The reqular expression pattern the url must match.  If defined, 
+ * <dd>The reqular expression pattern the url must match.  If defined,
  * this overrides <code>glob</code>.
  * <dt>ignoreCase
  * <dd>If present and <code>match</code> is defined, this causes the
@@ -93,24 +92,23 @@ import java.util.Properties;
  */
 
 public class MatchString {
-    String propsPrefix;		// our properties prefix
-    Regexp re = null;		// our expression to match
-    String glob = null;		// our glob match (if no re)
-    boolean invert = false;	// should we invert the result
-
     static final String PREFIX = "prefix";
     static final String SUFFIX = "suffix";
-    static final String MATCH =  "match";
-    static final String GLOB =   "glob";
-    static final String CASE =   "ignoreCase";
+    static final String MATCH = "match";
+    static final String GLOB = "glob";
+    static final String CASE = "ignoreCase";
     static final String INVERT = "invert";
+    String propsPrefix;        // our properties prefix
+    Regexp re = null;        // our expression to match
+    String glob = null;        // our glob match (if no re)
+    boolean invert = false;    // should we invert the result
 
     /**
      * Create a matcher for per-request URL checking.
      * This constructer is used if the
      * properties are to be evaluated on each request.
      *
-     * @param propsPrefix	The prefix to use in the properties object.
+     * @param propsPrefix The prefix to use in the properties object.
      */
 
     public MatchString(String propsPrefix) {
@@ -118,12 +116,12 @@ public class MatchString {
     }
 
     /**
-     * Create a matcher for one-time-only checking. 
+     * Create a matcher for one-time-only checking.
      * This constructor is used if the
      * properties are to be computed only once, at "init" time.
      *
-     * @param propsPrefix	The prefix to use in the properties object.
-     * @param props	The table to find the properties in.
+     * @param propsPrefix The prefix to use in the properties object.
+     * @param props       The table to find the properties in.
      */
 
     public MatchString(String propsPrefix, Properties props) {
@@ -135,22 +133,23 @@ public class MatchString {
      * Extract and setup the properties
      */
 
-    private void 
+    private void
     setup(Properties props) {
-	invert = Format.isTrue(propsPrefix + INVERT);
+        invert = Format.isTrue(propsPrefix + INVERT);
         String exp = props.getProperty(propsPrefix + MATCH);
         if (exp != null) {
-	    boolean ignoreCase = (props.getProperty(propsPrefix + CASE)!=null);
-	    try {
-		re = new Regexp(exp, ignoreCase);
-	    } catch (Exception e) {}
-	}
+            boolean ignoreCase = (props.getProperty(propsPrefix + CASE) != null);
+            try {
+                re = new Regexp(exp, ignoreCase);
+            } catch (Exception e) {
+            }
+        }
 
-	if (re == null) {
-	    glob = props.getProperty(propsPrefix + GLOB,
-		   props.getProperty(propsPrefix + PREFIX, "/") +
-		   "*" +
-		   props.getProperty(propsPrefix + SUFFIX, ""));
+        if (re == null) {
+            glob = props.getProperty(propsPrefix + GLOB,
+                    props.getProperty(propsPrefix + PREFIX, "/") +
+                            "*" +
+                            props.getProperty(propsPrefix + SUFFIX, ""));
         }
     }
 
@@ -161,13 +160,13 @@ public class MatchString {
 
     public boolean
     match(String url) {
-	if (re != null) {
-	    return (invert ^ (re.match(url) != null));
-	} else if (glob != null) {
-	    return invert ^ Glob.match(glob, url);
-	} else {
-	    throw new IllegalArgumentException("no properties provided");
-	}
+        if (re != null) {
+            return (invert ^ (re.match(url) != null));
+        } else if (glob != null) {
+            return invert ^ Glob.match(glob, url);
+        } else {
+            throw new IllegalArgumentException("no properties provided");
+        }
     }
 
     /**
@@ -186,7 +185,7 @@ public class MatchString {
      */
 
     public String prefix() {
-	return propsPrefix;
+        return propsPrefix;
     }
 
     /**
@@ -195,6 +194,6 @@ public class MatchString {
 
     public String
     toString() {
-        return  (glob + ", " + re);
+        return (glob + ", " + re);
     }
 }

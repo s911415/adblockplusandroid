@@ -17,59 +17,46 @@
 
 package org.adblockplus.libadblockplus;
 
-import java.util.concurrent.LinkedBlockingQueue;
-
+import android.util.Log;
 import org.adblockplus.android.Utils;
 
-import android.util.Log;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public final class JniExceptionHandler
-{
-  private final static String TAG = Utils.getTag(JniExceptionHandler.class);
+public final class JniExceptionHandler {
+    private final static String TAG = Utils.getTag(JniExceptionHandler.class);
 
-  private static LogWorker logWorker = null;
+    private static LogWorker logWorker = null;
 
-  static
-  {
-    logWorker = new LogWorker();
-    final Thread t = new Thread(logWorker);
-    t.setDaemon(true);
-    t.start();
-  }
-
-  public static void logException(final Throwable t)
-  {
-    logWorker.logException(t);
-  }
-
-  private final static class LogWorker implements Runnable
-  {
-    LinkedBlockingQueue<Throwable> exceptionQueue = new LinkedBlockingQueue<Throwable>();
-
-    private void logException(final Throwable t)
-    {
-      this.exceptionQueue.offer(t);
+    static {
+        logWorker = new LogWorker();
+        final Thread t = new Thread(logWorker);
+        t.setDaemon(true);
+        t.start();
     }
 
-    @Override
-    public void run()
-    {
-      for (;;)
-      {
-        try
-        {
-          final Throwable t = this.exceptionQueue.take();
-          Log.e(TAG, "Exception from JNI", t);
-        }
-        catch (final InterruptedException ie)
-        {
-          break;
-        }
-        catch (final Throwable ex)
-        {
-          // TODO: Swallow or log?
-        }
-      }
+    public static void logException(final Throwable t) {
+        logWorker.logException(t);
     }
-  }
+
+    private final static class LogWorker implements Runnable {
+        LinkedBlockingQueue<Throwable> exceptionQueue = new LinkedBlockingQueue<Throwable>();
+
+        private void logException(final Throwable t) {
+            this.exceptionQueue.offer(t);
+        }
+
+        @Override
+        public void run() {
+            for (; ; ) {
+                try {
+                    final Throwable t = this.exceptionQueue.take();
+                    Log.e(TAG, "Exception from JNI", t);
+                } catch (final InterruptedException ie) {
+                    break;
+                } catch (final Throwable ex) {
+                    // TODO: Swallow or log?
+                }
+            }
+        }
+    }
 }

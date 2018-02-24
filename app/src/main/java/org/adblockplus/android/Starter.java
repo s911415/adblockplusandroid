@@ -23,38 +23,33 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class Starter extends BroadcastReceiver
-{
+public class Starter extends BroadcastReceiver {
 
-  @Override
-  public void onReceive(final Context context, final Intent intent)
-  {
-    final String action = intent.getAction();
-    final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    boolean enabled = prefs.getBoolean(context.getString(R.string.pref_enabled), false);
-    boolean proxyenabled = prefs.getBoolean(context.getString(R.string.pref_proxyenabled), true);
-    final boolean autoconfigured = prefs.getBoolean(context.getString(R.string.pref_proxyautoconfigured), false);
-    if (Intent.ACTION_PACKAGE_REPLACED.equals(action))
-    {
-      final String pkg = context.getApplicationInfo().packageName;
-      final boolean us = pkg.equals(intent.getData().getSchemeSpecificPart());
-      enabled &= us;
-      proxyenabled &= us;
+    @Override
+    public void onReceive(final Context context, final Intent intent) {
+        final String action = intent.getAction();
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean enabled = prefs.getBoolean(context.getString(R.string.pref_enabled), false);
+        boolean proxyenabled = prefs.getBoolean(context.getString(R.string.pref_proxyenabled), true);
+        final boolean autoconfigured = prefs.getBoolean(context.getString(R.string.pref_proxyautoconfigured), false);
+        if (Intent.ACTION_PACKAGE_REPLACED.equals(action)) {
+            final String pkg = context.getApplicationInfo().packageName;
+            final boolean us = pkg.equals(intent.getData().getSchemeSpecificPart());
+            enabled &= us;
+            proxyenabled &= us;
+        }
+        if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+            final boolean startAtBoot = prefs.getBoolean(context.getString(R.string.pref_startatboot), context.getResources().getBoolean(R.bool.def_startatboot));
+            enabled &= startAtBoot;
+            proxyenabled &= startAtBoot;
+        }
+        if (enabled) {
+            final AdblockPlus application = AdblockPlus.getApplication();
+            application.setFilteringEnabled(true);
+            application.startEngine();
+        }
+        if (enabled || (proxyenabled && !autoconfigured))
+            context.startService(new Intent(context, ProxyService.class));
     }
-    if (Intent.ACTION_BOOT_COMPLETED.equals(action))
-    {
-      final boolean startAtBoot = prefs.getBoolean(context.getString(R.string.pref_startatboot), context.getResources().getBoolean(R.bool.def_startatboot));
-      enabled &= startAtBoot;
-      proxyenabled &= startAtBoot;
-    }
-    if (enabled)
-    {
-      final AdblockPlus application = AdblockPlus.getApplication();
-      application.setFilteringEnabled(true);
-      application.startEngine();
-    }
-    if (enabled || (proxyenabled && !autoconfigured))
-      context.startService(new Intent(context, ProxyService.class));
-  }
 
 }

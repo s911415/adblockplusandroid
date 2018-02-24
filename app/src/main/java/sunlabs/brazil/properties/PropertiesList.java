@@ -2,22 +2,22 @@
  * PropertiesList.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 2001-2006 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: drach.
  * Portions created by drach are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): drach, suhler.
  *
  * Version:  2.8
@@ -102,25 +102,10 @@
 
 package sunlabs.brazil.properties;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
-import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import sunlabs.brazil.util.Glob;
+
+import java.io.*;
+import java.util.*;
 
 /**
  * A <code>PropertiesList</code> instance is intended to be an element of
@@ -163,19 +148,24 @@ import sunlabs.brazil.util.Glob;
  * object.  If the result of the forwarded request is <code>null</code>,
  * the request is then passed to the wrapped <code>Properties</code>
  * object and it's result is returned.
- * 
- * @author	Steve Drach &lt;drach@sun.com&gt;
- * @version	2.8
  *
+ * @author Steve Drach &lt;drach@sun.com&gt;
+ * @version 2.8
  * @see java.util.Dictionary
  * @see java.util.Hashtable
  * @see java.util.Properties
  */
 public class PropertiesList extends Properties {
 
+    /**
+     * Set <code>true</code> to turn on debug output.  It's alot
+     * of output and probably of use only to the author.  Note,
+     * if <code>server.props</code> contains the name <code>debugProps</code>
+     * this variable will be set <code>true</code> by <code>Server</code>.
+     */
+    public static boolean debug;
     private Dictionary wrapped;
     private boolean searchNextFirst;
-
     private PropertiesList next, prior;
 
     /**
@@ -183,25 +173,25 @@ public class PropertiesList extends Properties {
      * an empty new <code>Properties</code> object.
      */
     public PropertiesList() {
-	if (debug) {
-	    log("*** PL@" + id(this) + " created " + caller());
-	}
-	wrapped = new Properties();
+        if (debug) {
+            log("*** PL@" + id(this) + " created " + caller());
+        }
+        wrapped = new Properties();
     }
 
     /**
      * Constructs a new <code>PropertiesList</code> object that wraps
      * the input <code>Dictionary</code>.
      *
-     * @param dict        The <code>Dictionary</code> object wrapped
-     *                    by this <code>PropertiesList</code>.
+     * @param dict The <code>Dictionary</code> object wrapped
+     *             by this <code>PropertiesList</code>.
      */
     public PropertiesList(Dictionary dict) {
-	if (debug) {
-	    log("*** PL@" + id(this) + " created with dict " + id(dict)
-		+ " " + caller());
-	}
-	wrapped = dict;
+        if (debug) {
+            log("*** PL@" + id(this) + " created with dict " + id(dict)
+                    + " " + caller());
+        }
+        wrapped = dict;
     }
 
     /**
@@ -212,32 +202,23 @@ public class PropertiesList extends Properties {
      * objects in the linked list are searched, and only if the
      * result of that search was <code>null</code>.
      *
-     * @param dict             The <code>Dictionary</code> object wrapped
-     *                         by this <code>PropertiesList</code>.
-     * 
-     * @param searchNextFirst  If <code>true</code> all the following
-     *                         objects in the list are searched before
-     *                         this one.
+     * @param dict            The <code>Dictionary</code> object wrapped
+     *                        by this <code>PropertiesList</code>.
+     * @param searchNextFirst If <code>true</code> all the following
+     *                        objects in the list are searched before
+     *                        this one.
      */
     public PropertiesList(Dictionary dict, boolean searchNextFirst) {
-	this(dict);
-	this.searchNextFirst = searchNextFirst;
+        this(dict);
+        this.searchNextFirst = searchNextFirst;
     }
-
-    /**
-     * Set <code>true</code> to turn on debug output.  It's alot
-     * of output and probably of use only to the author.  Note,
-     * if <code>server.props</code> contains the name <code>debugProps</code>
-     * this variable will be set <code>true</code> by <code>Server</code>.
-     */
-    public static boolean debug;
 
     /**
      * Returns the <code>Dictionary</code> object wrapped by this
      * <code>PropertiesList</code>.
      */
     public Dictionary getWrapped() {
-	return wrapped;
+        return wrapped;
     }
 
     /**
@@ -245,33 +226,33 @@ public class PropertiesList extends Properties {
      * a linked list following the object referenced by
      * the <code>cursor</code> parameter.  The result is
      * a list that could look like:
-     *
+     * <p>
      * request.props -> cursor -> this -> serverProps
      * <p>
      * Any transient properties lists's are skipped over before
      * this one is inserted into the list
      *
-     * @param cursor      The list object that will precede this object.
+     * @param cursor The list object that will precede this object.
      */
     public void addAfter(PropertiesList cursor) {
-	while (cursor!=null && cursor.isTransient()) {
-	    if (debug) {
-		log("*** addAfter skipping transient: " + cursor);
-	    }
-	    cursor = cursor.next;
-	}
-	if (cursor != null) {
-	    next = cursor.next;
-	    if (next != null) {
-		next.prior = (PropertiesList)this;
-	    }
-	    prior = cursor;
-	    cursor.next = (PropertiesList)this;
-	}
-	if (debug) {
-	    log("*** addAfter " + cursor.toString());
-	    getHead().dump(true, null);
-	}
+        while (cursor != null && cursor.isTransient()) {
+            if (debug) {
+                log("*** addAfter skipping transient: " + cursor);
+            }
+            cursor = cursor.next;
+        }
+        if (cursor != null) {
+            next = cursor.next;
+            if (next != null) {
+                next.prior = (PropertiesList) this;
+            }
+            prior = cursor;
+            cursor.next = (PropertiesList) this;
+        }
+        if (debug) {
+            log("*** addAfter " + cursor.toString());
+            getHead().dump(true, null);
+        }
     }
 
     /**
@@ -279,78 +260,78 @@ public class PropertiesList extends Properties {
      * a linked list preceding the object referenced by
      * the <code>cursor</code> parameter.  The result is
      * a list that could look like:
-     *
+     * <p>
      * request.props -> this -> cursor -> serverProps
      *
-     * @param cursor      The list object that will succede this object.
+     * @param cursor The list object that will succede this object.
      */
     public void addBefore(PropertiesList cursor) {
-	if (cursor != null) {
-	    prior = cursor.prior;
-	    if (prior != null) {
-		prior.next = (PropertiesList)this;
-	    }
-	    next = cursor;
-	    cursor.prior = (PropertiesList)this;
-	}
-	if (debug) {
-	    log("*** addBefore " + cursor.toString());
-	    getHead().dump(true, null);
-	}
+        if (cursor != null) {
+            prior = cursor.prior;
+            if (prior != null) {
+                prior.next = (PropertiesList) this;
+            }
+            next = cursor;
+            cursor.prior = (PropertiesList) this;
+        }
+        if (debug) {
+            log("*** addBefore " + cursor.toString());
+            getHead().dump(true, null);
+        }
     }
 
     /**
      * Remove this object from the list in which it's a member.
      *
-     * @return            <code>true</code>.
+     * @return <code>true</code>.
      */
     public boolean remove() {
-	PropertiesList head = null;
-	if (debug) {
-	    if ((head = getHead()) == (PropertiesList)this) {
-		head = head.next;
-	    }
-	}
-	if (next != null) {
-	    next.prior = prior;
-	}
-	if (prior != null) {
-	    prior.next = next;
-	}
-	next = prior = null;
-	if (debug) {
-	    log("*** remove " + toString());
-	    head.dump(true, null);
-	}
-	return true;
+        PropertiesList head = null;
+        if (debug) {
+            if ((head = getHead()) == (PropertiesList) this) {
+                head = head.next;
+            }
+        }
+        if (next != null) {
+            next.prior = prior;
+        }
+        if (prior != null) {
+            prior.next = next;
+        }
+        next = prior = null;
+        if (debug) {
+            log("*** remove " + toString());
+            head.dump(true, null);
+        }
+        return true;
     }
 
     /**
      * Returns the <code>PropertiesList</code> object that succedes this
      * object on the list of which this object is a member.
      *
-     * @return            A <code>PropertiesList</code> object or 
-     *                    <code>null</code>.
+     * @return A <code>PropertiesList</code> object or
+     * <code>null</code>.
      */
     public PropertiesList getNext() {
-	if (debug) {
-	    log("*** getNext: PropertyList@" + id(next));
-	}
-	return next;
+        if (debug) {
+            log("*** getNext: PropertyList@" + id(next));
+        }
+        return next;
     }
 
     /**
      * Returns the <code>PropertiesList</code> object that precedes this
      * object on the list of which this object is a member.
      *
-     * @return            A <code>PropertiesList</code> object or
-     *                    <code>null</code>.
+     * @return A <code>PropertiesList</code> object or
+     * <code>null</code>.
      */
     public PropertiesList getPrior() {
-	if (debug) {
-	    log("*** getPrior: PropertyList@" + id(prior));
-	}
-	return prior;
+        if (debug) {
+            log("*** getPrior: PropertyList@" + id(prior));
+        }
+        return prior;
     }
 
     /**
@@ -358,14 +339,14 @@ public class PropertiesList extends Properties {
      * on the list of which this object is a member.  Note that the first
      * object may be this object.
      *
-     * @return            A <code>PropertiesList</code> object.
+     * @return A <code>PropertiesList</code> object.
      */
     public PropertiesList getHead() {
-	PropertiesList head = (PropertiesList)this;
-	while (head.prior != null) {
-	    head = head.prior;
-	}
-	return head;
+        PropertiesList head = (PropertiesList) this;
+        while (head.prior != null) {
+            head = head.prior;
+        }
+        return head;
     }
 
     /**
@@ -373,21 +354,20 @@ public class PropertiesList extends Properties {
      * this object is a member that wraps the <code>Dictionary</code>
      * parameter.
      *
-     * @param d           The <code>Dictionary</code> that is compared with the
-     *                    wrapped <code>Dictionary</code>'s for a match.
-     *
-     * @return            <code>PropertiesList</code> object that wraps the
-     *                    input parameter, otherwise <code>null</code>.
+     * @param d The <code>Dictionary</code> that is compared with the
+     *          wrapped <code>Dictionary</code>'s for a match.
+     * @return <code>PropertiesList</code> object that wraps the
+     * input parameter, otherwise <code>null</code>.
      */
     public PropertiesList wraps(Dictionary d) {
-	PropertiesList cursor = getHead();
-	do {
-	    if (cursor.wrapped == d) {
-		return cursor;
-	    }
-	    cursor = cursor.next;
-	} while (cursor != null);
-	return null;
+        PropertiesList cursor = getHead();
+        do {
+            if (cursor.wrapped == d) {
+                return cursor;
+            }
+            cursor = cursor.next;
+        } while (cursor != null);
+        return null;
     }
 
     /**
@@ -395,29 +375,28 @@ public class PropertiesList extends Properties {
      * succeeding objects that are on the same list as this object
      * is.
      *
-     * @param full        If <code>true</code> also print the contents of the
-     *                    wrapped <code>Dictionary</code> object.
-     *
-     * @param msg         If not <code>null</code>, add this message to the 
-     *                    header line.
+     * @param full If <code>true</code> also print the contents of the
+     *             wrapped <code>Dictionary</code> object.
+     * @param msg  If not <code>null</code>, add this message to the
+     *             header line.
      */
     public void dump(boolean full, String msg) {
-	boolean debug = this.debug;
-	this.debug = full;
-	if (msg == null) {
-	    log("***\ndumping PropertiesList");
-	} else {
-	    log("***\ndumping PropertiesList " + msg);
-	}
-	dump2();
-	this.debug = debug;
+        boolean debug = this.debug;
+        this.debug = full;
+        if (msg == null) {
+            log("***\ndumping PropertiesList");
+        } else {
+            log("***\ndumping PropertiesList " + msg);
+        }
+        dump2();
+        this.debug = debug;
     }
 
     private void dump2() {
-	log("-----\n" + toString());
-	if (next != null) {
-	    next.dump2();
-	}
+        log("-----\n" + toString());
+        if (next != null) {
+            next.dump2();
+        }
     }
 
     /*
@@ -428,52 +407,52 @@ public class PropertiesList extends Properties {
      * Invokes the same method on the wrapped <code>Dictionary</code> object.
      */
     public synchronized Enumeration elements() {
-	return wrapped.elements();
+        return wrapped.elements();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Dictionary</code> object.
      */
     public synchronized Object get(Object key) {
-	return wrapped.get(key);
+        return wrapped.get(key);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Dictionary</code> object.
      */
     public boolean isEmpty() {
-	return wrapped.isEmpty();
+        return wrapped.isEmpty();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Dictionary</code> object.
      */
     public synchronized Enumeration keys() {
-	return wrapped.keys();
+        return wrapped.keys();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Dictionary</code> object.
      */
     public synchronized Object put(Object key, Object value) {
-	if (debug) {
-	    log("*** PL@" + id(this) + " put(" + key + ", " + value + ")");
-	}
-	return wrapped.put(key, value);
+        if (debug) {
+            log("*** PL@" + id(this) + " put(" + key + ", " + value + ")");
+        }
+        return wrapped.put(key, value);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Dictionary</code> object.
      */
     public synchronized Object remove(Object key) {
-	return wrapped.remove(key);
+        return wrapped.remove(key);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Dictionary</code> object.
      */
     public int size() {
-	return wrapped.size();
+        return wrapped.size();
     }
 
     /*
@@ -484,70 +463,70 @@ public class PropertiesList extends Properties {
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public synchronized void clear() {
-	((Hashtable)wrapped).clear();
+        ((Hashtable) wrapped).clear();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public synchronized Object clone() {
-	return ((Hashtable)wrapped).clone();
+        return ((Hashtable) wrapped).clone();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public synchronized boolean contains(Object value) {
-	return ((Hashtable)wrapped).contains(value);
+        return ((Hashtable) wrapped).contains(value);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public synchronized boolean containsKey(Object key) {
-	return ((Hashtable)wrapped).containsKey(key);
+        return ((Hashtable) wrapped).containsKey(key);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public Set entrySet() {
-	return ((Hashtable)wrapped).entrySet();
+        return ((Hashtable) wrapped).entrySet();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public boolean equals(Object o) {
-	return ((Hashtable)wrapped).equals(o);
+        return ((Hashtable) wrapped).equals(o);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public int hashCode() {
-	return ((Hashtable)wrapped).hashCode();
-    }    
+        return ((Hashtable) wrapped).hashCode();
+    }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public Set keySet() {
-	return ((Hashtable)wrapped).keySet();
+        return ((Hashtable) wrapped).keySet();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public void putAll(Map t) {
-	((Hashtable)wrapped).putAll(t);
+        ((Hashtable) wrapped).putAll(t);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Hashtable</code> object.
      */
     public Collection values() {
-	return ((Hashtable)wrapped).values();
+        return ((Hashtable) wrapped).values();
     }
 
     // There is no rational way to override rehash(), so it's not here
@@ -560,17 +539,17 @@ public class PropertiesList extends Properties {
      * is <code>true</code>, the result of invoking <code>toString</code>
      * on the wrapped <code>Dictionary</code> is appended.
      *
-     * @return            <code>String</code> representation of this object.
+     * @return <code>String</code> representation of this object.
      */
     public synchronized String toString() {
-	StringBuffer sb = new StringBuffer("PropertiesList@").append(id(this));
-	sb.append("\n    next: ").append(id(next));
-	sb.append("\n    prior: ").append(id(prior));
-	sb.append("\n    wrapped: ").append(id(wrapped));
-	if (debug) {
-	    sb.append("\n    ").append(wrapped.toString());
-	}
-	return sb.toString();
+        StringBuffer sb = new StringBuffer("PropertiesList@").append(id(this));
+        sb.append("\n    next: ").append(id(next));
+        sb.append("\n    prior: ").append(id(prior));
+        sb.append("\n    wrapped: ").append(id(wrapped));
+        if (debug) {
+            sb.append("\n    ").append(wrapped.toString());
+        }
+        return sb.toString();
     }
 
     /*
@@ -579,7 +558,7 @@ public class PropertiesList extends Properties {
 
     /**
      * Looks up <code>key</code> in the wrapped object.  If the result is
-     * <code>null</code> 
+     * <code>null</code>
      * the request is forwarded to the succeeding object in the list
      * of which this object is a member.  If the search order was changed
      * by constructing this object with the two parameter constructor, the
@@ -587,29 +566,28 @@ public class PropertiesList extends Properties {
      * forwarded request is <code>null</code>, the <code>key</code> is looked
      * up in the wrapped <code>Properties</code> object.
      *
-     * @param key         The key whose value is sought.
-     *
-     * @return            The value or <code>null</code>.
+     * @param key The key whose value is sought.
+     * @return The value or <code>null</code>.
      */
     public String getProperty(String key) {
-	String value = null;
-	if (searchNextFirst) {
-	    if (next != null) {
-		value = next.getProperty(key);
-	    }
-	    if (value == null) {
-		value = getValue(key);
-	    }
-	} else {
-	    value = getValue(key);
-	    if (value == null && next != null) {
-		value = next.getProperty(key);
-	    }
-	}
-	if (debug) {
-	    log("*** PL@" + id(this) + " getProperty(" + key + ") => " + value);
-	}
-	return value;
+        String value = null;
+        if (searchNextFirst) {
+            if (next != null) {
+                value = next.getProperty(key);
+            }
+            if (value == null) {
+                value = getValue(key);
+            }
+        } else {
+            value = getValue(key);
+            if (value == null && next != null) {
+                value = next.getProperty(key);
+            }
+        }
+        if (debug) {
+            log("*** PL@" + id(this) + " getProperty(" + key + ") => " + value);
+        }
+        return value;
     }
 
     /**
@@ -618,104 +596,104 @@ public class PropertiesList extends Properties {
      * value.
      *
      * @param key          The key whose value is sought.
-     *
      * @param defaultValue The default value.
-     *
-     * @return             The value or <code>null</code>.
+     * @return The value or <code>null</code>.
      */
     public String getProperty(String key, String defaultValue) {
-	String value = getProperty(key);
-	if (value == null) {
-	    value = defaultValue;
-	}
-	if (debug) {
-	    log("*** PL@" + id(this) + " get(" + key + ") => " + value);
-	}
-	return value;
+        String value = getProperty(key);
+        if (value == null) {
+            value = defaultValue;
+        }
+        if (debug) {
+            log("*** PL@" + id(this) + " get(" + key + ") => " + value);
+        }
+        return value;
     }
 
     /**
      * Remove a property from a a chain of properties lists.
      * if "all" is specified, then remove all the keys and values from
      * all property lists in the chain instead of just the first one found.
-     * @param key       The key whose value is to be removed
-     * @param all	remove all matching keys.
-     * @return		true, if at least one key/value pair was removed.
+     *
+     * @param key The key whose value is to be removed
+     * @param all remove all matching keys.
+     * @return true, if at least one key/value pair was removed.
      */
 
     public boolean removeProperty(String key, boolean all) {
-	boolean removed = false;
-	if (searchNextFirst) {
-	    if (next != null) {
-		removed = next.removeProperty(key, all);
-	    }
-	    if (removed==false || all) {
-		removed = (remove(key) != null) || removed;
-	    }
-	} else {
-	    removed = (remove(key) != null);
-	    if (removed==false || all) {
-		removed = next.removeProperty(key, all) || removed;
-	    }
-	}
-	if (debug) {
-	    log("*** PL@" + id(this) + " removeProperty(" + key + ") => " + removed);
-	}
-	return removed;
+        boolean removed = false;
+        if (searchNextFirst) {
+            if (next != null) {
+                removed = next.removeProperty(key, all);
+            }
+            if (removed == false || all) {
+                removed = (remove(key) != null) || removed;
+            }
+        } else {
+            removed = (remove(key) != null);
+            if (removed == false || all) {
+                removed = next.removeProperty(key, all) || removed;
+            }
+        }
+        if (debug) {
+            log("*** PL@" + id(this) + " removeProperty(" + key + ") => " + removed);
+        }
+        return removed;
     }
 
     /**
      * Remove the key and its associated value from the first properties
      * object in the chain that contains this key.
-     * @return	true, if the key was removed.
+     *
+     * @return true, if the key was removed.
      */
     public boolean removeProperty(String key) {
-	return removeProperty(key, false);
+        return removeProperty(key, false);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Properties</code> object.
      */
     public void list(PrintStream out) {
-	if (wrapped instanceof Properties) {
-	    ((Properties)wrapped).list(out);
-	}
+        if (wrapped instanceof Properties) {
+            ((Properties) wrapped).list(out);
+        }
     }
 
     /**
      * Invokes the same method on the wrapped <code>Properties</code> object.
      */
     public void list(PrintWriter out) {
-	if (wrapped instanceof Properties) {
-	    ((Properties)wrapped).list(out);
-	}
+        if (wrapped instanceof Properties) {
+            ((Properties) wrapped).list(out);
+        }
     }
 
     /**
      * Invokes the same method on the wrapped <code>Properties</code> object.
      */
     public synchronized void load(InputStream in) throws IOException {
-	if (wrapped instanceof Properties) {
-	    ((Properties)wrapped).load(in);
-	}
+        if (wrapped instanceof Properties) {
+            ((Properties) wrapped).load(in);
+        }
     }
 
     /**
      * Invokes the same method on the wrapped <code>Properties</code> object.
      */
     public Enumeration propertyNames() {
-	Hashtable h = new Hashtable();
-	enumerate(h);
-	return h.keys();
+        Hashtable h = new Hashtable();
+        enumerate(h);
+        return h.keys();
     }
 
     /**
      * Invokes the same method on the wrapped <code>Properties</code> object.
      */
     public synchronized void save(OutputStream out, String header) {
-	if (wrapped instanceof Properties) {
-	    ((Properties)wrapped).save(out, header);
-	}
+        if (wrapped instanceof Properties) {
+            ((Properties) wrapped).save(out, header);
+        }
     }
 
     /**
@@ -724,38 +702,37 @@ public class PropertiesList extends Properties {
      * <code>Dictionary</code> object.
      */
     public Object setProperty(String key, String value) {
-	if (wrapped instanceof Properties) {
-	    return ((Properties)wrapped).setProperty(key, value);
-	}
-	return wrapped.put(key, value);
+        if (wrapped instanceof Properties) {
+            return ((Properties) wrapped).setProperty(key, value);
+        }
+        return wrapped.put(key, value);
     }
 
     /**
      * Invokes the same method on the wrapped <code>Properties</code> object.
      */
     public void store(OutputStream out, String header) throws IOException {
-	if (wrapped instanceof Properties) {
-	    ((Properties)wrapped).store(out, header);
-	}
+        if (wrapped instanceof Properties) {
+            ((Properties) wrapped).store(out, header);
+        }
     }
 
     /*
      * Additional method on wrapped object
      */
-    
+
     /**
      * Returns an <code>Enumeration</code> of property names that
      * match a <code>glob</code> pattern.
      *
-     * @param pattern     The <code>glob</code> pattern to match.
-     *
-     * @return            An <code>Enumeration</code> containing
-     *                    matching property names, if any.
+     * @param pattern The <code>glob</code> pattern to match.
+     * @return An <code>Enumeration</code> containing
+     * matching property names, if any.
      */
     public Enumeration propertyNames(String pattern) {
-	Hashtable h = new Hashtable();
-	enumerate(h, pattern);
-	return h.keys();
+        Hashtable h = new Hashtable();
+        enumerate(h, pattern);
+        return h.keys();
     }
 
     /*
@@ -763,82 +740,84 @@ public class PropertiesList extends Properties {
      */
 
     private String getValue(String key) {
-	if (wrapped instanceof Properties) {
-	    return ((Properties)wrapped).getProperty(key);
-	} else {
-	    return (String)wrapped.get(key);
-	}
+        if (wrapped instanceof Properties) {
+            return ((Properties) wrapped).getProperty(key);
+        } else {
+            return (String) wrapped.get(key);
+        }
     }
 
     private synchronized void enumerate(Hashtable h) {
-	enumerate(h, null);
+        enumerate(h, null);
     }
-	
+
     private synchronized void enumerate(Hashtable h, String pattern) {
-	if (next != null && ! searchNextFirst) {
-	    next.enumerate(h, pattern);
-	}
-	Enumeration e;
-	if (wrapped instanceof Properties) {
-	    e = ((Properties)wrapped).propertyNames();
-	} else {
-	    e = wrapped.keys();
-	}
-	while (e.hasMoreElements()) {
-	    String s = null;
-	    try {
-		s = (String)e.nextElement();
-		if (pattern == null || Glob.match(pattern, s)) {
-		    h.put(s, s);
-		}
-	    } catch (ClassCastException x) {}
-	}
-	if (next != null && searchNextFirst) {
-	    next.enumerate(h, pattern);
-	}
+        if (next != null && !searchNextFirst) {
+            next.enumerate(h, pattern);
+        }
+        Enumeration e;
+        if (wrapped instanceof Properties) {
+            e = ((Properties) wrapped).propertyNames();
+        } else {
+            e = wrapped.keys();
+        }
+        while (e.hasMoreElements()) {
+            String s = null;
+            try {
+                s = (String) e.nextElement();
+                if (pattern == null || Glob.match(pattern, s)) {
+                    h.put(s, s);
+                }
+            } catch (ClassCastException x) {
+            }
+        }
+        if (next != null && searchNextFirst) {
+            next.enumerate(h, pattern);
+        }
     }
 
     private String id(Object o) {
-	if (o == null) {
-	    return "null";
-	}
-	return Integer.toHexString(System.identityHashCode(o));
+        if (o == null) {
+            return "null";
+        }
+        return Integer.toHexString(System.identityHashCode(o));
     }
 
     private String caller() {
-	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	PrintWriter out = new PrintWriter(baos);
-	(new Throwable()).printStackTrace(out);
-	try {
-	    out.close();
-	    BufferedReader in = new BufferedReader(
-		                new InputStreamReader(
-			        new ByteArrayInputStream(baos.toByteArray())));
-	    String line = null;
-	    boolean found = false;
-	    while ((line = in.readLine()) != null) {
-		if (line.indexOf("PropertiesList.<init>") != -1) {
-		    found = true;
-		    continue;
-		}
-		if (found) {
-		    return line.trim();
-		}
-	    }
-	} catch (IOException e) {}
-	return "";
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintWriter out = new PrintWriter(baos);
+        (new Throwable()).printStackTrace(out);
+        try {
+            out.close();
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(
+                            new ByteArrayInputStream(baos.toByteArray())));
+            String line = null;
+            boolean found = false;
+            while ((line = in.readLine()) != null) {
+                if (line.indexOf("PropertiesList.<init>") != -1) {
+                    found = true;
+                    continue;
+                }
+                if (found) {
+                    return line.trim();
+                }
+            }
+        } catch (IOException e) {
+        }
+        return "";
     }
 
     // Can't use server.log since we don't have access to either a
     // Server object or a Request object
     private void log(Object msg) {
-	if (msg == null) {
-	    return;
-	}
-	if (!(msg instanceof String)) {
-	    msg = msg.toString();
-	}
-	System.out.println(msg);
+        if (msg == null) {
+            return;
+        }
+        if (!(msg instanceof String)) {
+            msg = msg.toString();
+        }
+        System.out.println(msg);
     }
 
     /**

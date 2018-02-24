@@ -62,6 +62,50 @@ public class IptablesProxyConfigurator implements ProxyConfigurator {
         return cmd.output;
     }
 
+    public static List<String> getIptablesOutput(final Context context) {
+        try {
+            if (!RootTools.isAccessGiven()) {
+                throw new IllegalStateException("No root access");
+            }
+
+            final File ipt = context.getFileStreamPath("iptables");
+
+            if (!ipt.exists()) {
+                throw new FileNotFoundException("No iptables executable");
+            }
+
+            final String path = ipt.getAbsolutePath();
+
+            runRootCommand("chmod 700 " + path, DEFAULT_TIMEOUT);
+
+            boolean compatible = false;
+            boolean version = false;
+
+            String command = path + " --version\n" + path + " -L -t nat -n\n";
+
+            final List<String> result = runRootCommand(command, DEFAULT_TIMEOUT);
+
+            for (final String line : result) {
+                if (line.contains("OUTPUT")) {
+                    compatible = true;
+                }
+                if (line.contains("v1.4.")) {
+                    version = true;
+                }
+            }
+
+            if (!(compatible && version)) {
+                throw new IllegalStateException("Incompatible iptables excutable");
+            }
+
+            command = path + " -L -t nat -n\n";
+
+            return runRootCommand(command, DEFAULT_TIMEOUT);
+        } catch (final Throwable t) {
+            return null;
+        }
+    }
+
     @Override
     public boolean initialize() {
         try {
@@ -155,50 +199,6 @@ public class IptablesProxyConfigurator implements ProxyConfigurator {
     @Override
     public void shutdown() {
         // Nothing to do here
-    }
-
-    public static List<String> getIptablesOutput(final Context context) {
-        try {
-            if (!RootTools.isAccessGiven()) {
-                throw new IllegalStateException("No root access");
-            }
-
-            final File ipt = context.getFileStreamPath("iptables");
-
-            if (!ipt.exists()) {
-                throw new FileNotFoundException("No iptables executable");
-            }
-
-            final String path = ipt.getAbsolutePath();
-
-            runRootCommand("chmod 700 " + path, DEFAULT_TIMEOUT);
-
-            boolean compatible = false;
-            boolean version = false;
-
-            String command = path + " --version\n" + path + " -L -t nat -n\n";
-
-            final List<String> result = runRootCommand(command, DEFAULT_TIMEOUT);
-
-            for (final String line : result) {
-                if (line.contains("OUTPUT")) {
-                    compatible = true;
-                }
-                if (line.contains("v1.4.")) {
-                    version = true;
-                }
-            }
-
-            if (!(compatible && version)) {
-                throw new IllegalStateException("Incompatible iptables excutable");
-            }
-
-            command = path + " -L -t nat -n\n";
-
-            return runRootCommand(command, DEFAULT_TIMEOUT);
-        } catch (final Throwable t) {
-            return null;
-        }
     }
 
     @Override

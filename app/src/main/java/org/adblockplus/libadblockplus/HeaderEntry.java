@@ -17,52 +17,43 @@
 
 package org.adblockplus.libadblockplus;
 
-public class HeaderEntry
-{
-  private final String key;
-  private final String value;
+public class HeaderEntry {
+    private final String key;
+    private final String value;
 
-  public HeaderEntry(final String key, final String value)
-  {
-    this.key = key;
-    this.value = value;
-  }
-
-  public static HeaderEntry of(final String key, final String value)
-  {
-    return new HeaderEntry(key, value);
-  }
-
-  public String getKey()
-  {
-    return this.key;
-  }
-
-  public String getValue()
-  {
-    return this.value;
-  }
-
-  @Override
-  public int hashCode()
-  {
-    return this.key.hashCode() * 31 + this.value.hashCode();
-  }
-
-  @Override
-  public boolean equals(final Object o)
-  {
-    if (!(o instanceof HeaderEntry))
-    {
-      return false;
+    public HeaderEntry(final String key, final String value) {
+        this.key = key;
+        this.value = value;
     }
-    final HeaderEntry other = (HeaderEntry) o;
-    return this.key.equals(other.key) && this.value.equals(other.value);
-  }
 
-  @Override
-  public String toString()
-  {
-    return this.key + ": " + this.value;
-  }
+    public static HeaderEntry of(final String key, final String value) {
+        return new HeaderEntry(key, value);
+    }
+
+    public String getKey() {
+        return this.key;
+    }
+
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.key.hashCode() * 31 + this.value.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof HeaderEntry)) {
+            return false;
+        }
+        final HeaderEntry other = (HeaderEntry) o;
+        return this.key.equals(other.key) && this.value.equals(other.value);
+    }
+
+    @Override
+    public String toString() {
+        return this.key + ": " + this.value;
+    }
 }

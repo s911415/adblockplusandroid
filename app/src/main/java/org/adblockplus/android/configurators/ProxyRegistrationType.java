@@ -19,30 +19,26 @@ package org.adblockplus.android.configurators;
 
 import org.adblockplus.android.ProxyServerType;
 
-public enum ProxyRegistrationType
-{
-  UNKNOWN(ProxyServerType.UNKNOWN, false),
-  CYANOGENMOD(ProxyServerType.HTTPS, true),
-  IPTABLES(ProxyServerType.HTTP, true),
-  NATIVE(ProxyServerType.HTTPS, true),
-  MANUAL(ProxyServerType.HTTPS, false);
+public enum ProxyRegistrationType {
+    UNKNOWN(ProxyServerType.UNKNOWN, false),
+    CYANOGENMOD(ProxyServerType.HTTPS, true),
+    IPTABLES(ProxyServerType.HTTP, true),
+    NATIVE(ProxyServerType.HTTPS, true),
+    MANUAL(ProxyServerType.HTTPS, false);
 
-  private final ProxyServerType proxyType;
-  private final boolean autoConfigured;
+    private final ProxyServerType proxyType;
+    private final boolean autoConfigured;
 
-  private ProxyRegistrationType(final ProxyServerType proxyType, final boolean autoConfigured)
-  {
-    this.proxyType = proxyType;
-    this.autoConfigured = autoConfigured;
-  }
+    private ProxyRegistrationType(final ProxyServerType proxyType, final boolean autoConfigured) {
+        this.proxyType = proxyType;
+        this.autoConfigured = autoConfigured;
+    }
 
-  public ProxyServerType getProxyType()
-  {
-    return this.proxyType;
-  }
+    public ProxyServerType getProxyType() {
+        return this.proxyType;
+    }
 
-  public boolean isAutoConfigured()
-  {
-    return this.autoConfigured;
-  }
+    public boolean isAutoConfigured() {
+        return this.autoConfigured;
+    }
 }

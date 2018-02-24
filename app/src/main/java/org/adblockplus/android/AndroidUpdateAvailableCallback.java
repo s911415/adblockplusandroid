@@ -17,22 +17,18 @@
 
 package org.adblockplus.android;
 
+import android.content.Context;
 import org.adblockplus.libadblockplus.UpdateAvailableCallback;
 
-import android.content.Context;
+public class AndroidUpdateAvailableCallback extends UpdateAvailableCallback {
+    private final Context context;
 
-public class AndroidUpdateAvailableCallback extends UpdateAvailableCallback
-{
-  private final Context context;
+    public AndroidUpdateAvailableCallback(final Context context) {
+        this.context = context;
+    }
 
-  public AndroidUpdateAvailableCallback(final Context context)
-  {
-    this.context = context;
-  }
-
-  @Override
-  public void updateAvailableCallback(String url)
-  {
-    Utils.showUpdateNotification(this.context, url, null);
-  }
+    @Override
+    public void updateAvailableCallback(String url) {
+        Utils.showUpdateNotification(this.context, url, null);
+    }
 }

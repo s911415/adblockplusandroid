@@ -22,8 +22,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.preference.*;
-import android.support.v7.widget.Toolbar;
-import android.view.ViewGroup;
 
 /**
  * PreferencesActivity which automatically sets preference summaries according

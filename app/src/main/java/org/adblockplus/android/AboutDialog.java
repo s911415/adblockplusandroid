@@ -29,64 +29,56 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class AboutDialog extends Dialog
-{
-  public AboutDialog(final Context context)
-  {
-    super(context);
-  }
-
-  @Override
-  public void onCreate(final Bundle savedInstanceState)
-  {
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
-    setContentView(R.layout.about);
-
-    final Context context = this.getContext();
-    // Get package version code and name
-    String versionName = "--";
-    int versionCode = -1;
-    try
-    {
-      final PackageInfo pi = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-      versionName = pi.versionName;
-      versionCode = pi.versionCode;
-    }
-    catch (final NameNotFoundException ex)
-    {
-      // ignore - it can not happen because we query information about ourselves
+public class AboutDialog extends Dialog {
+    public AboutDialog(final Context context) {
+        super(context);
     }
 
-    // Construct html
-    final StringBuilder info = new StringBuilder();
-    info.append("<h3>");
-    info.append(context.getString(R.string.app_name));
-    info.append("</h3>");
-    info.append("<p>");
-    info.append(context.getString(R.string.version));
-    info.append(": ");
-    info.append(versionName);
-    info.append(" ");
-    info.append(context.getString(R.string.build));
-    info.append(" ");
-    info.append(versionCode);
-    info.append("</p>");
-    Utils.appendRawTextFile(context, info, R.raw.info);
-    Utils.appendRawTextFile(context, info, R.raw.legal);
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.about);
 
-    // Show text
-    final TextView tv = (TextView) findViewById(R.id.about_text);
-    tv.setText(Html.fromHtml(info.toString()));
-    tv.setMovementMethod(LinkMovementMethod.getInstance());
+        final Context context = this.getContext();
+        // Get package version code and name
+        String versionName = "--";
+        int versionCode = -1;
+        try {
+            final PackageInfo pi = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+            versionCode = pi.versionCode;
+        } catch (final NameNotFoundException ex) {
+            // ignore - it can not happen because we query information about ourselves
+        }
 
-    final Button okButton = (Button) findViewById(R.id.close_about);
-    okButton.setOnClickListener(new View.OnClickListener()
-    {
-      @Override
-      public void onClick(View v)
-      {
-        AboutDialog.this.dismiss();
-      }
-    });
-  }
+        // Construct html
+        final StringBuilder info = new StringBuilder();
+        info.append("<h3>");
+        info.append(context.getString(R.string.app_name));
+        info.append("</h3>");
+        info.append("<p>");
+        info.append(context.getString(R.string.version));
+        info.append(": ");
+        info.append(versionName);
+        info.append(" ");
+        info.append(context.getString(R.string.build));
+        info.append(" ");
+        info.append(versionCode);
+        info.append("</p>");
+        Utils.appendRawTextFile(context, info, R.raw.info);
+        Utils.appendRawTextFile(context, info, R.raw.legal);
+
+        // Show text
+        final TextView tv = (TextView) findViewById(R.id.about_text);
+        tv.setText(Html.fromHtml(info.toString()));
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
+
+        final Button okButton = (Button) findViewById(R.id.close_about);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AboutDialog.this.dismiss();
+            }
+        });
+    }
 }

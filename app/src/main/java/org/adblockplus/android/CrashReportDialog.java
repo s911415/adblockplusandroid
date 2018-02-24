@@ -17,11 +17,15 @@
 
 package org.adblockplus.android;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.regex.Pattern;
-
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
+import android.util.Xml;
+import android.view.View;
+import android.view.Window;
+import android.widget.EditText;
+import android.widget.Toast;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -32,147 +36,127 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.xmlpull.v1.XmlSerializer;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.Xml;
-import android.view.View;
-import android.view.Window;
-import android.widget.EditText;
-import android.widget.Toast;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.regex.Pattern;
 
 /**
  * Shows crash report dialog asking user to submit crash report together with comments.
  */
-public final class CrashReportDialog extends AppCompatActivity
-{
-  private static final String TAG = Utils.getTag(CrashReportDialog.class);
-  private String report;
+public final class CrashReportDialog extends AppCompatActivity {
+    private static final String TAG = Utils.getTag(CrashReportDialog.class);
+    private String report;
 
-  @Override
-  protected void onCreate(final Bundle savedInstanceState)
-  {
-    super.onCreate(savedInstanceState);
-    requestWindowFeature(Window.FEATURE_LEFT_ICON);
-    setContentView(R.layout.crashreport);
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_LEFT_ICON);
+        setContentView(R.layout.crashreport);
 
-    final Bundle extras = getIntent().getExtras();
-    if (extras == null)
-    {
-      finish();
-      return;
-    }
-    report = extras.getString("report");
-
-    getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
-  }
-
-  public void onOk(final View v)
-  {
-    final String comment = ((EditText) findViewById(R.id.comments)).getText().toString();
-
-    try
-    {
-      final String[] reportLines = report.split(System.getProperty("line.separator"));
-      final int api = Integer.parseInt(reportLines[0]);
-      final int build = Integer.parseInt(reportLines[1]);
-
-      final XmlSerializer xmlSerializer = Xml.newSerializer();
-      final StringWriter writer = new StringWriter();
-
-      xmlSerializer.setOutput(writer);
-      xmlSerializer.startDocument("UTF-8", true);
-      xmlSerializer.startTag("", "crashreport");
-      xmlSerializer.attribute("", "version", "1");
-      xmlSerializer.attribute("", "api", String.valueOf(api));
-      xmlSerializer.attribute("", "build", String.valueOf(build));
-      xmlSerializer.startTag("", "error");
-      xmlSerializer.attribute("", "type", reportLines[2]);
-      xmlSerializer.startTag("", "message");
-      xmlSerializer.text(reportLines[3]);
-      xmlSerializer.endTag("", "message");
-      xmlSerializer.startTag("", "stacktrace");
-      final Pattern p = Pattern.compile("\\|");
-      boolean hasCause = false;
-      int i = 4;
-      while (i < reportLines.length)
-      {
-        if ("cause".equals(reportLines[i]))
-        {
-          xmlSerializer.endTag("", "stacktrace");
-          xmlSerializer.startTag("", "cause");
-          hasCause = true;
-          i++;
-          xmlSerializer.attribute("", "type", reportLines[i]);
-          i++;
-          xmlSerializer.startTag("", "message");
-          xmlSerializer.text(reportLines[i]);
-          i++;
-          xmlSerializer.endTag("", "message");
-          xmlSerializer.startTag("", "stacktrace");
-          continue;
+        final Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            finish();
+            return;
         }
-        Log.e(TAG, "Line: " + reportLines[i]);
-        final String[] element = TextUtils.split(reportLines[i], p);
-        xmlSerializer.startTag("", "frame");
-        xmlSerializer.attribute("", "class", element[0]);
-        xmlSerializer.attribute("", "method", element[1]);
-        xmlSerializer.attribute("", "isnative", element[2]);
-        xmlSerializer.attribute("", "file", element[3]);
-        xmlSerializer.attribute("", "line", element[4]);
-        xmlSerializer.endTag("", "frame");
-        i++;
-      }
-      xmlSerializer.endTag("", "stacktrace");
-      if (hasCause)
-        xmlSerializer.endTag("", "cause");
-      xmlSerializer.endTag("", "error");
-      xmlSerializer.startTag("", "comment");
-      xmlSerializer.text(comment);
-      xmlSerializer.endTag("", "comment");
-      xmlSerializer.endTag("", "crashreport");
-      xmlSerializer.endDocument();
+        report = extras.getString("report");
 
-      final String xml = writer.toString();
-      final HttpClient httpclient = new DefaultHttpClient();
-      final HttpPost httppost = new HttpPost(getString(R.string.crash_report_url));
-      httppost.setHeader("Content-Type", "text/xml; charset=UTF-8");
-      httppost.addHeader("X-Adblock-Plus", "yes");
-      httppost.setEntity(new StringEntity(xml));
-      final HttpResponse httpresponse = httpclient.execute(httppost);
-      final StatusLine statusLine = httpresponse.getStatusLine();
-      Log.e(TAG, statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
-      Log.e(TAG, EntityUtils.toString(httpresponse.getEntity()));
-      if (statusLine.getStatusCode() != 200)
-        throw new ClientProtocolException();
-      final String response = EntityUtils.toString(httpresponse.getEntity());
-      if (!"saved".equals(response))
-        throw new ClientProtocolException();
-      deleteFile(CrashHandler.REPORT_FILE);
+        getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_dialog_alert);
     }
-    catch (final ClientProtocolException e)
-    {
-      Log.e(TAG, "Failed to submit a crash", e);
-      Toast.makeText(this, R.string.msg_crash_submission_failure, Toast.LENGTH_LONG).show();
-    }
-    catch (final IOException e)
-    {
-      Log.e(TAG, "Failed to submit a crash", e);
-      Toast.makeText(this, R.string.msg_crash_submission_failure, Toast.LENGTH_LONG).show();
-    }
-    catch (final Exception e)
-    {
-      Log.e(TAG, "Failed to create report", e);
-      // Assuming corrupted report file, just silently deleting it
-      deleteFile(CrashHandler.REPORT_FILE);
-    }
-    finish();
-  }
 
-  public void onCancel(final View v)
-  {
-    deleteFile(CrashHandler.REPORT_FILE);
-    finish();
-  }
+    public void onOk(final View v) {
+        final String comment = ((EditText) findViewById(R.id.comments)).getText().toString();
+
+        try {
+            final String[] reportLines = report.split(System.getProperty("line.separator"));
+            final int api = Integer.parseInt(reportLines[0]);
+            final int build = Integer.parseInt(reportLines[1]);
+
+            final XmlSerializer xmlSerializer = Xml.newSerializer();
+            final StringWriter writer = new StringWriter();
+
+            xmlSerializer.setOutput(writer);
+            xmlSerializer.startDocument("UTF-8", true);
+            xmlSerializer.startTag("", "crashreport");
+            xmlSerializer.attribute("", "version", "1");
+            xmlSerializer.attribute("", "api", String.valueOf(api));
+            xmlSerializer.attribute("", "build", String.valueOf(build));
+            xmlSerializer.startTag("", "error");
+            xmlSerializer.attribute("", "type", reportLines[2]);
+            xmlSerializer.startTag("", "message");
+            xmlSerializer.text(reportLines[3]);
+            xmlSerializer.endTag("", "message");
+            xmlSerializer.startTag("", "stacktrace");
+            final Pattern p = Pattern.compile("\\|");
+            boolean hasCause = false;
+            int i = 4;
+            while (i < reportLines.length) {
+                if ("cause".equals(reportLines[i])) {
+                    xmlSerializer.endTag("", "stacktrace");
+                    xmlSerializer.startTag("", "cause");
+                    hasCause = true;
+                    i++;
+                    xmlSerializer.attribute("", "type", reportLines[i]);
+                    i++;
+                    xmlSerializer.startTag("", "message");
+                    xmlSerializer.text(reportLines[i]);
+                    i++;
+                    xmlSerializer.endTag("", "message");
+                    xmlSerializer.startTag("", "stacktrace");
+                    continue;
+                }
+                Log.e(TAG, "Line: " + reportLines[i]);
+                final String[] element = TextUtils.split(reportLines[i], p);
+                xmlSerializer.startTag("", "frame");
+                xmlSerializer.attribute("", "class", element[0]);
+                xmlSerializer.attribute("", "method", element[1]);
+                xmlSerializer.attribute("", "isnative", element[2]);
+                xmlSerializer.attribute("", "file", element[3]);
+                xmlSerializer.attribute("", "line", element[4]);
+                xmlSerializer.endTag("", "frame");
+                i++;
+            }
+            xmlSerializer.endTag("", "stacktrace");
+            if (hasCause)
+                xmlSerializer.endTag("", "cause");
+            xmlSerializer.endTag("", "error");
+            xmlSerializer.startTag("", "comment");
+            xmlSerializer.text(comment);
+            xmlSerializer.endTag("", "comment");
+            xmlSerializer.endTag("", "crashreport");
+            xmlSerializer.endDocument();
+
+            final String xml = writer.toString();
+            final HttpClient httpclient = new DefaultHttpClient();
+            final HttpPost httppost = new HttpPost(getString(R.string.crash_report_url));
+            httppost.setHeader("Content-Type", "text/xml; charset=UTF-8");
+            httppost.addHeader("X-Adblock-Plus", "yes");
+            httppost.setEntity(new StringEntity(xml));
+            final HttpResponse httpresponse = httpclient.execute(httppost);
+            final StatusLine statusLine = httpresponse.getStatusLine();
+            Log.e(TAG, statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
+            Log.e(TAG, EntityUtils.toString(httpresponse.getEntity()));
+            if (statusLine.getStatusCode() != 200)
+                throw new ClientProtocolException();
+            final String response = EntityUtils.toString(httpresponse.getEntity());
+            if (!"saved".equals(response))
+                throw new ClientProtocolException();
+            deleteFile(CrashHandler.REPORT_FILE);
+        } catch (final ClientProtocolException e) {
+            Log.e(TAG, "Failed to submit a crash", e);
+            Toast.makeText(this, R.string.msg_crash_submission_failure, Toast.LENGTH_LONG).show();
+        } catch (final IOException e) {
+            Log.e(TAG, "Failed to submit a crash", e);
+            Toast.makeText(this, R.string.msg_crash_submission_failure, Toast.LENGTH_LONG).show();
+        } catch (final Exception e) {
+            Log.e(TAG, "Failed to create report", e);
+            // Assuming corrupted report file, just silently deleting it
+            deleteFile(CrashHandler.REPORT_FILE);
+        }
+        finish();
+    }
+
+    public void onCancel(final View v) {
+        deleteFile(CrashHandler.REPORT_FILE);
+        finish();
+    }
 }

@@ -75,12 +75,11 @@ import java.util.zip.InflaterInputStream;
  */
 
 public class RequestHandler extends BaseRequestHandler {
-    private AdblockPlus application;
-    private String via;
     static final Pattern RE_HTTP = Pattern.compile("^https?:");
-
     private static final AtomicLong BLOCKED_REQUESTS = new AtomicLong();
     private static final AtomicLong UNBLOCKED_REQUESTS = new AtomicLong();
+    private AdblockPlus application;
+    private String via;
 
     public static long getBlockedRequestCount() {
         return BLOCKED_REQUESTS.get();

@@ -17,7 +17,6 @@
 
 package org.adblockplus.android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,39 +28,32 @@ import android.widget.TextView;
 /**
  * Displays configuration warning message.
  */
-public class ConfigurationActivity extends AppCompatActivity
-{
-  private int port;
+public class ConfigurationActivity extends AppCompatActivity {
+    private int port;
 
-  @Override
-  public void onCreate(final Bundle savedInstanceState)
-  {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.configuration);
-    port = getIntent().getIntExtra("port", 0);
-    final String msg1 = getString(R.string.msg_notraffic);
-    final String msg2 = getString(R.string.msg_configuration);
-    ((TextView) findViewById(R.id.message_text)).setText(Html.fromHtml(msg1 + " " + msg2));
-  }
-
-  public void onOk(final View view)
-  {
-    finish();
-  }
-
-  public void onHelp(final View view)
-  {
-    final Intent intent;
-    if (ProxyService.GLOBAL_PROXY_USER_CONFIGURABLE)
-    {
-      intent = new Intent(this, ProxyConfigurationActivity.class).putExtra("port", port);
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.configuration);
+        port = getIntent().getIntExtra("port", 0);
+        final String msg1 = getString(R.string.msg_notraffic);
+        final String msg2 = getString(R.string.msg_configuration);
+        ((TextView) findViewById(R.id.message_text)).setText(Html.fromHtml(msg1 + " " + msg2));
     }
-    else
-    {
-      final Uri uri = Uri.parse(getString(R.string.configuring_proxy_url));
-      intent = new Intent(Intent.ACTION_VIEW, uri);
+
+    public void onOk(final View view) {
+        finish();
     }
-    startActivity(intent);
-    finish();
-  }
+
+    public void onHelp(final View view) {
+        final Intent intent;
+        if (ProxyService.GLOBAL_PROXY_USER_CONFIGURABLE) {
+            intent = new Intent(this, ProxyConfigurationActivity.class).putExtra("port", port);
+        } else {
+            final Uri uri = Uri.parse(getString(R.string.configuring_proxy_url));
+            intent = new Intent(Intent.ACTION_VIEW, uri);
+        }
+        startActivity(intent);
+        finish();
+    }
 }

@@ -17,63 +17,55 @@
 
 package org.adblockplus.android;
 
-import java.util.List;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-class SubscriptionParser extends DefaultHandler
-{
-  private static final String SUBSCRIPTION = "subscription";
-  private static final String TITLE = "title";
-  private static final String SPECIALIZATION = "specialization";
-  private static final String URL = "url";
-  private static final String HOMEPAGE = "homepage";
-  private static final String PREFIXES = "prefixes";
-  private static final String AUTHOR = "author";
+import java.util.List;
 
-  private final List<Subscription> subscriptions;
-  private Subscription currentSubscription;
+class SubscriptionParser extends DefaultHandler {
+    private static final String SUBSCRIPTION = "subscription";
+    private static final String TITLE = "title";
+    private static final String SPECIALIZATION = "specialization";
+    private static final String URL = "url";
+    private static final String HOMEPAGE = "homepage";
+    private static final String PREFIXES = "prefixes";
+    private static final String AUTHOR = "author";
 
-  public SubscriptionParser(final List<Subscription> subscriptions)
-  {
-    super();
-    this.subscriptions = subscriptions;
-  }
+    private final List<Subscription> subscriptions;
+    private Subscription currentSubscription;
 
-  @Override
-  public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException
-  {
-    if (localName.equalsIgnoreCase(SUBSCRIPTION))
-    {
-      currentSubscription = new Subscription();
-      currentSubscription.title = attributes.getValue(TITLE);
-      currentSubscription.specialization = attributes.getValue(SPECIALIZATION);
-      currentSubscription.url = attributes.getValue(URL);
-      currentSubscription.homepage = attributes.getValue(HOMEPAGE);
-      final String prefix = attributes.getValue(PREFIXES);
-      if (prefix != null)
-      {
-        final String[] prefixes = prefix.split(",");
-        currentSubscription.prefixes = prefixes;
-      }
-      currentSubscription.author = attributes.getValue(AUTHOR);
+    public SubscriptionParser(final List<Subscription> subscriptions) {
+        super();
+        this.subscriptions = subscriptions;
     }
-    super.startElement(uri, localName, qName, attributes);
-  }
 
-  @Override
-  public void endElement(final String uri, final String localName, final String qName) throws SAXException
-  {
-    if (localName.equalsIgnoreCase(SUBSCRIPTION))
-    {
-      if (subscriptions != null && currentSubscription != null)
-      {
-        subscriptions.add(currentSubscription);
-      }
-      currentSubscription = null;
+    @Override
+    public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
+        if (localName.equalsIgnoreCase(SUBSCRIPTION)) {
+            currentSubscription = new Subscription();
+            currentSubscription.title = attributes.getValue(TITLE);
+            currentSubscription.specialization = attributes.getValue(SPECIALIZATION);
+            currentSubscription.url = attributes.getValue(URL);
+            currentSubscription.homepage = attributes.getValue(HOMEPAGE);
+            final String prefix = attributes.getValue(PREFIXES);
+            if (prefix != null) {
+                final String[] prefixes = prefix.split(",");
+                currentSubscription.prefixes = prefixes;
+            }
+            currentSubscription.author = attributes.getValue(AUTHOR);
+        }
+        super.startElement(uri, localName, qName, attributes);
     }
-    super.endElement(uri, localName, qName);
-  }
+
+    @Override
+    public void endElement(final String uri, final String localName, final String qName) throws SAXException {
+        if (localName.equalsIgnoreCase(SUBSCRIPTION)) {
+            if (subscriptions != null && currentSubscription != null) {
+                subscriptions.add(currentSubscription);
+            }
+            currentSubscription = null;
+        }
+        super.endElement(uri, localName, qName);
+    }
 }

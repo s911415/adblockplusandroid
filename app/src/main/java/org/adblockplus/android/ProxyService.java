@@ -45,45 +45,78 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 
 public class ProxyService extends Service implements OnSharedPreferenceChangeListener {
-    private static final String TAG = Utils.getTag(ProxyService.class);
-
-    private static final String LOCALHOST = "127.0.0.1";
-
-    private static final int[] PORT_VARIANTS = new int[]{-1, 2020, 3030, 4040, 5050, 6060, 7070, 9090, 1234, 12345, 4321, 0};
-
-    private static final boolean LOG_REQUESTS = false;
-
-    private static final long POSITION_RIGHT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD ? Long.MIN_VALUE : Long.MAX_VALUE;
-
     /**
      * This flag indicates that this mobile device runs an Android version that allows the user to configure a http(s) proxy.
      */
     public static final boolean GLOBAL_PROXY_USER_CONFIGURABLE = Build.VERSION.SDK_INT >= 12; // Honeycomb 3.1
-
     /**
      * Broadcasted when service starts or stops.
      */
     public static final String BROADCAST_STATE_CHANGED = "org.adblockplus.android.SERVICE_STATE_CHANGED";
-
     /**
      * Broadcasted if proxy fails to start.
      */
     public static final String BROADCAST_PROXY_FAILED = "org.adblockplus.android.PROXY_FAILURE";
-
     /**
      * Proxy state changed
      */
     public static final String PROXY_STATE_CHANGED_ACTION = "org.adblockplus.android.PROXY_STATE_CHANGED";
-
-    boolean hideIcon;
-
-    protected ProxyServer proxy = null;
-
-    protected int port;
-
+    private static final String TAG = Utils.getTag(ProxyService.class);
+    private static final String LOCALHOST = "127.0.0.1";
+    private static final int[] PORT_VARIANTS = new int[]{-1, 2020, 3030, 4040, 5050, 6060, 7070, 9090, 1234, 12345, 4321, 0};
+    private static final boolean LOG_REQUESTS = false;
+    private static final long POSITION_RIGHT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD ? Long.MIN_VALUE : Long.MAX_VALUE;
     private final Properties proxyConfiguration = new Properties();
-
+    private final IBinder binder = new LocalBinder();
+    /**
+     * Stops service if proxy fails.
+     */
+    private final BroadcastReceiver proxyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            if (intent.getAction().equals(ProxyService.BROADCAST_PROXY_FAILED)) {
+                stopSelf();
+            }
+        }
+    };
+    protected ProxyServer proxy = null;
+    protected int port;
+    boolean hideIcon;
     private ProxyConfigurator proxyConfigurator = null;
+    /**
+     * <p>
+     * Proxy state change receiver.
+     * </p>
+     */
+    private final BroadcastReceiver proxyStateChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            if (intent != null && PROXY_STATE_CHANGED_ACTION.equals(intent.getAction())) {
+                final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                notificationManager.notify(AdblockPlus.ONGOING_NOTIFICATION_ID, getNotification());
+                ProxyService.this.sendStateChangedBroadcast();
+            }
+        }
+    };
+
+    /**
+     * @return {@code true} if the given host string resolves to {@code localhost}
+     */
+    public static boolean isLocalhost(final String host) {
+        try {
+            if (StringUtils.isEmpty(host)) {
+                return false;
+            }
+
+            if (host.equals("127.0.0.1") || host.equalsIgnoreCase("localhost")) {
+                return true;
+            }
+
+            return InetAddress.getByName(host).isLoopbackAddress();
+        } catch (final Exception e) {
+            return false;
+        }
+    }
 
     @SuppressLint("NewApi")
     @Override
@@ -311,25 +344,6 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
         }
     }
 
-    /**
-     * @return {@code true} if the given host string resolves to {@code localhost}
-     */
-    public static boolean isLocalhost(final String host) {
-        try {
-            if (StringUtils.isEmpty(host)) {
-                return false;
-            }
-
-            if (host.equals("127.0.0.1") || host.equalsIgnoreCase("localhost")) {
-                return true;
-            }
-
-            return InetAddress.getByName(host).isLoopbackAddress();
-        } catch (final Exception e) {
-            return false;
-        }
-    }
-
     private void passProxySettings(final String proxyHost, final String proxyPort, final String proxyExcl) {
         try {
             final CrashHandler handler = (CrashHandler) Thread.getDefaultUncaughtExceptionHandler();
@@ -458,46 +472,16 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
         sendBroadcast(stateIntent);
     }
 
-    private final IBinder binder = new LocalBinder();
+    @Override
+    public IBinder onBind(final Intent intent) {
+        return binder;
+    }
 
     public final class LocalBinder extends Binder {
         public ProxyService getService() {
             return ProxyService.this;
         }
     }
-
-    @Override
-    public IBinder onBind(final Intent intent) {
-        return binder;
-    }
-
-    /**
-     * Stops service if proxy fails.
-     */
-    private final BroadcastReceiver proxyReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            if (intent.getAction().equals(ProxyService.BROADCAST_PROXY_FAILED)) {
-                stopSelf();
-            }
-        }
-    };
-
-    /**
-     * <p>
-     * Proxy state change receiver.
-     * </p>
-     */
-    private final BroadcastReceiver proxyStateChangedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            if (intent != null && PROXY_STATE_CHANGED_ACTION.equals(intent.getAction())) {
-                final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                notificationManager.notify(AdblockPlus.ONGOING_NOTIFICATION_ID, getNotification());
-                ProxyService.this.sendStateChangedBroadcast();
-            }
-        }
-    };
 
     final class ProxyServer extends Server {
         @Override

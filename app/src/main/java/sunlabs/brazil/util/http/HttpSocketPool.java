@@ -2,22 +2,22 @@
  * HttpSocketPool.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 1999-2004 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: cstevens.
  * Portions created by cstevens are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): cstevens, suhler.
  *
  * Version:  2.2
@@ -77,12 +77,11 @@ import java.io.IOException;
  * case another HTTP request is made to the same remote host.  Currently, the
  * only instance of this interface is used by the <code>HttpRequest</code>
  * class.
- * 
- * @author      Colin Stevens (colin.stevens@sun.com)
- * @version		2.2
+ *
+ * @author Colin Stevens (colin.stevens@sun.com)
+ * @version 2.2
  */
-public interface HttpSocketPool
-{
+public interface HttpSocketPool {
     /**
      * Returns an <code>HttpSocket</code> that can be used to communicate
      * with the specified port on the named host.
@@ -94,40 +93,26 @@ public interface HttpSocketPool
      * <code>close</code> when the <code>HttpSocket</code> isn't needed
      * anymore.
      *
-     * @param	host
-     *		The host name.
-     *
-     * @param	port
-     *		The port number.
-     *
-     * @param	reuse
-     *		<code>true</code> to request that this pool attempt to find
-     *		and reuse an existing idle connection, <code>false</code>
-     *		to request that this pool establish a new connection to
-     *		the named host.
-     *
-     * @return	The <code>HttpSocket</code>.
-     *		
-     * @throws	IOException
-     *		if there is a problem connecting to the specified port on
-     *		the named host.  The <code>IOException</code>s (and 
-     *		subclasses) that might be thrown depend upon how the
-     *		socket connection is established.  See the socket
-     *		documentation for further details.  Some subclasses that
-     *		might be thrown are as follows:
-     *
-     * @throws	java.io.UnknownHostException
-     *		if the host name cannot be resolved.
-     *
-     * @throws	java.io.ConnectionException
-     *		if the named host is not listening on the specified port.
-     *
-     * @throws	java.io.InterruptedIOException
-     *		if the connection times out or this thread is interrupted by
-     *		<code>Thread.interrupt</code>.
+     * @param    host The host name.
+     * @param    port The port number.
+     * @param    reuse <code>true</code> to request that this pool attempt to find
+     * and reuse an existing idle connection, <code>false</code>
+     * to request that this pool establish a new connection to
+     * the named host.
+     * @return The <code>HttpSocket</code>.
+     * @throws IOException if there is a problem connecting to the specified port on
+     * the named host.  The <code>IOException</code>s (and
+     * subclasses) that might be thrown depend upon how the
+     * socket connection is established.  See the socket
+     * documentation for further details.  Some subclasses that
+     * might be thrown are as follows:
+     * @throws java.io.UnknownHostException if the host name cannot be resolved.
+     * @throws java.io.ConnectionException if the named host is not listening on the specified port.
+     * @throws java.io.InterruptedIOException if the connection times out or this thread is interrupted by
+     * <code>Thread.interrupt</code>.
      */
     public HttpSocket get(String host, int port, boolean reuse)
-	throws IOException;
+            throws IOException;
 
     /**
      * Releases an <code>HttpSocket</code> to this pool when it is not
@@ -139,13 +124,10 @@ public interface HttpSocketPool
      * After calling this method, the user should not refer to the specified
      * <code>HttpSocket</code> any more.
      *
-     * @param	hs
-     *		The <code>HttpSocket</code> to release.
-     *
-     * @param	reuse
-     *		<code>true</code> if the specified <code>HttpSocket</code>
-     *		should be put back into the idle pool, <code>false</code>
-     *		if it should be released immediately.
+     * @param    hs The <code>HttpSocket</code> to release.
+     * @param    reuse <code>true</code> if the specified <code>HttpSocket</code>
+     * should be put back into the idle pool, <code>false</code>
+     * if it should be released immediately.
      */
     public void close(HttpSocket hs, boolean reuse);
 }

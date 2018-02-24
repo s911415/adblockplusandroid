@@ -17,60 +17,51 @@
 
 package org.adblockplus.libadblockplus;
 
-public class Notification extends JsValue
-{
-  static
-  {
-    System.loadLibrary("adblockplus-jni");
-    registerNatives();
-  }
+public class Notification extends JsValue {
+    static {
+        System.loadLibrary("adblockplus-jni");
+        registerNatives();
+    }
 
-  private Notification(final long ptr)
-  {
-    super(ptr);
-  }
+    private Notification(final long ptr) {
+        super(ptr);
+    }
 
-  public static enum Type
-  {
-    INFORMATION,
-    QUESTION,
-    CRITICAL,
-    INVALID
-  }
+    private final static native void registerNatives();
 
-  public String getMessageString()
-  {
-    return getMessageString(this.ptr);
-  }
+    private final static native String getMessageString(long ptr);
 
-  public String getTitle()
-  {
-    return getTitle(this.ptr);
-  }
+    private final static native String getTitle(long ptr);
 
-  public Type getType()
-  {
-    return getType(this.ptr);
-  }
+    private final static native Type getType(long ptr);
 
-  public void markAsShown()
-  {
-    markAsShown(this.ptr);
-  }
+    private final static native void markAsShown(long ptr);
 
-  @Override
-  public String toString()
-  {
-    return this.getTitle() + " - " + this.getMessageString();
-  }
+    public String getMessageString() {
+        return getMessageString(this.ptr);
+    }
 
-  private final static native void registerNatives();
+    public String getTitle() {
+        return getTitle(this.ptr);
+    }
 
-  private final static native String getMessageString(long ptr);
+    public Type getType() {
+        return getType(this.ptr);
+    }
 
-  private final static native String getTitle(long ptr);
+    public void markAsShown() {
+        markAsShown(this.ptr);
+    }
 
-  private final static native Type getType(long ptr);
+    @Override
+    public String toString() {
+        return this.getTitle() + " - " + this.getMessageString();
+    }
 
-  private final static native void markAsShown(long ptr);
+    public static enum Type {
+        INFORMATION,
+        QUESTION,
+        CRITICAL,
+        INVALID
+    }
 }

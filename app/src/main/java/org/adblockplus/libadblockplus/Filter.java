@@ -17,77 +17,65 @@
 
 package org.adblockplus.libadblockplus;
 
-public final class Filter extends JsValue
-{
-  static
-  {
-    System.loadLibrary("adblockplus-jni");
-    registerNatives();
-  }
-
-  public Filter(final JsValue jsValue)
-  {
-    super(ctor(jsValue.ptr));
-  }
-
-  private Filter(final long pointer)
-  {
-    super(pointer);
-  }
-
-  public Type getType()
-  {
-    return getType(this.ptr);
-  }
-
-  public boolean isListed()
-  {
-    return isListed(this.ptr);
-  }
-
-  public void addToList()
-  {
-    addToList(this.ptr);
-  }
-
-  public void removeFromList()
-  {
-    removeFromList(this.ptr);
-  }
-
-  @Override
-  public int hashCode()
-  {
-    return (int)(this.ptr >> 32) * (int)this.ptr;
-  }
-
-  @Override
-  public boolean equals(final Object o)
-  {
-    if (!(o instanceof Filter))
-    {
-      return false;
+public final class Filter extends JsValue {
+    static {
+        System.loadLibrary("adblockplus-jni");
+        registerNatives();
     }
 
-    return operatorEquals(this.ptr, ((Filter)o).ptr);
-  }
+    public Filter(final JsValue jsValue) {
+        super(ctor(jsValue.ptr));
+    }
 
-  public static enum Type
-  {
-    BLOCKING, EXCEPTION, ELEMHIDE, ELEMHIDE_EXCEPTION, COMMENT, INVALID;
-  }
+    private Filter(final long pointer) {
+        super(pointer);
+    }
 
-  private final static native void registerNatives();
+    private final static native void registerNatives();
 
-  private final static native long ctor(long jsValuePtr);
+    private final static native long ctor(long jsValuePtr);
 
-  private final static native Type getType(long ptr);
+    private final static native Type getType(long ptr);
 
-  private final static native boolean isListed(long ptr);
+    private final static native boolean isListed(long ptr);
 
-  private final static native void addToList(long ptr);
+    private final static native void addToList(long ptr);
 
-  private final static native void removeFromList(long ptr);
+    private final static native void removeFromList(long ptr);
 
-  private final static native boolean operatorEquals(long ptr, long other);
+    private final static native boolean operatorEquals(long ptr, long other);
+
+    public Type getType() {
+        return getType(this.ptr);
+    }
+
+    public boolean isListed() {
+        return isListed(this.ptr);
+    }
+
+    public void addToList() {
+        addToList(this.ptr);
+    }
+
+    public void removeFromList() {
+        removeFromList(this.ptr);
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (this.ptr >> 32) * (int) this.ptr;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof Filter)) {
+            return false;
+        }
+
+        return operatorEquals(this.ptr, ((Filter) o).ptr);
+    }
+
+    public static enum Type {
+        BLOCKING, EXCEPTION, ELEMHIDE, ELEMHIDE_EXCEPTION, COMMENT, INVALID;
+    }
 }

@@ -2,22 +2,22 @@
  * SocketFactory.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 1999-2004 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: cstevens.
  * Portions created by cstevens are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): cstevens, suhler.
  *
  * Version:  2.2
@@ -105,11 +105,10 @@ import java.net.Socket;
  * the request since the IP address of the target machine was unknown.
  * </ul>
  *
- * @author	Colin Stevens (colin.stevens@sun.com)
- * @version		2.2
+ * @author Colin Stevens (colin.stevens@sun.com)
+ * @version 2.2
  */
-public interface SocketFactory
-{
+public interface SocketFactory {
     /**
      * The default socket factory.  It just creates a standard
      * <code>Socket</code> to the specified host and port, and is exactly
@@ -129,28 +128,20 @@ public interface SocketFactory
      * might actually redirect all connections via some other proxy machine,
      * etc.
      *
-     * @param	host
-     *		The host name.
-     *
-     * @param	port
-     *		The port number.
-     *
-     * @return	An object that provides socket-like communication.
-     *
-     * @throws	IOException
-     *		If there is some problem establishing the socket to the
-     *		specified port on the named host.
+     * @param    host The host name.
+     * @param    port The port number.
+     * @return An object that provides socket-like communication.
+     * @throws IOException If there is some problem establishing the socket to the
+     * specified port on the named host.
      */
     public Socket newSocket(String host, int port) throws IOException;
 }
 
 class DefaultSocketFactory
-    implements SocketFactory
-{
+        implements SocketFactory {
     public Socket
     newSocket(String host, int port)
-	throws IOException
-    {
-	return new Socket(host, port);
+            throws IOException {
+        return new Socket(host, port);
     }
 }

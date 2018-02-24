@@ -2,22 +2,22 @@
  * HttpSocket.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 1999-2002 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: cstevens.
  * Portions created by cstevens are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): cstevens, suhler.
  *
  * Version:  2.1
@@ -56,14 +56,11 @@
 
 package sunlabs.brazil.util.http;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import sunlabs.brazil.util.SocketFactory;
+
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import sunlabs.brazil.util.SocketFactory;
 
 /**
  * This class is used as the bag of information kept about a open, idle
@@ -74,59 +71,52 @@ import sunlabs.brazil.util.SocketFactory;
  * This class should not be visible at this scope.  It is only here until
  * a better place for it is found.
  */
-public class HttpSocket
-{
+public class HttpSocket {
+    private static int count = 0;
     public String host;
     public int port;
-
     public boolean firstTime = true;
     public long lastUsed;
     public int timesUsed = 1;
-
     public Socket sock;
     public InputStream in;
     public OutputStream out;
-
-    private static int count = 0;
     private int serial;
 
-    public
-    HttpSocket(String host, int port)
-	throws IOException, UnknownHostException 
-    {
-	this.host = host;
-	this.port = port;
+    public HttpSocket(String host, int port)
+            throws IOException, UnknownHostException {
+        this.host = host;
+        this.port = port;
 
-	SocketFactory socketFactory = HttpRequest.socketFactory;
-	if (socketFactory == null) {
-	    socketFactory = SocketFactory.defaultFactory;
-	}
+        SocketFactory socketFactory = HttpRequest.socketFactory;
+        if (socketFactory == null) {
+            socketFactory = SocketFactory.defaultFactory;
+        }
 
-	sock = socketFactory.newSocket(host, port);
-	in = new BufferedInputStream(sock.getInputStream());
-	out = new BufferedOutputStream(sock.getOutputStream());
+        sock = socketFactory.newSocket(host, port);
+        in = new BufferedInputStream(sock.getInputStream());
+        out = new BufferedOutputStream(sock.getOutputStream());
 
-	serial = count++;
+        serial = count++;
     }
 
     void
-    close()
-    {
-	in = null;
-	out = null;
+    close() {
+        in = null;
+        out = null;
 
-	if (sock != null) {
-	    try {
-		sock.close();
-	    } catch (IOException e) {}
-	}
+        if (sock != null) {
+            try {
+                sock.close();
+            } catch (IOException e) {
+            }
+        }
 
-	sock = null;
+        sock = null;
     }
 
     public String
-    toString()
-    {
-	return host + ":" + port + "-" + serial + "-" + timesUsed;
+    toString() {
+        return host + ":" + port + "-" + serial + "-" + timesUsed;
     }
 }

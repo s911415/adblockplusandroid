@@ -28,95 +28,79 @@ Modified by Andrey Novikov
 
 package org.literateprograms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
-public class BoyerMoore
-{
-	private Map<Byte, Integer> mRightMostIndexes;
-	private byte[] mPattern;
+public class BoyerMoore {
+    private Map<Byte, Integer> mRightMostIndexes;
+    private byte[] mPattern;
 
-	public BoyerMoore(byte[] pattern)
-	{
-		if (pattern == null)
-			throw new NullPointerException("Pattern can not be null");
-		if (pattern.length == 0)
-			throw new IllegalArgumentException("Pattern can not be empty");
+    public BoyerMoore(byte[] pattern) {
+        if (pattern == null)
+            throw new NullPointerException("Pattern can not be null");
+        if (pattern.length == 0)
+            throw new IllegalArgumentException("Pattern can not be empty");
 
-		mPattern = pattern;
-		mRightMostIndexes = preprocessForBadByteShift(pattern);
-	}
+        mPattern = pattern;
+        mRightMostIndexes = preprocessForBadByteShift(pattern);
+    }
 
-	public List<Integer> match(byte[] buffer)
-	{
-		return match(mPattern, buffer, 0, -1, mRightMostIndexes);
-	}
+    public static List<Integer> match(byte[] pattern, byte[] buffer) {
+        Map<Byte, Integer> rightMostIndexes = preprocessForBadByteShift(pattern);
+        return match(pattern, buffer, 0, -1, rightMostIndexes);
+    }
 
-	public List<Integer> match(byte[] buffer, int offset, int length)
-	{
-		return match(mPattern, buffer, offset, length, mRightMostIndexes);
-	}
+    private static List<Integer> match(byte[] pattern, byte[] buffer, int offset, int length, Map<Byte, Integer> rightMostIndexes) {
+        if (buffer == null)
+            throw new NullPointerException("Buffer can not be null");
 
-	public static List<Integer> match(byte[] pattern, byte[] buffer)
-	{
-		Map<Byte, Integer> rightMostIndexes = preprocessForBadByteShift(pattern);
-		return match(pattern, buffer, 0, -1, rightMostIndexes);
-	}
+        List<Integer> matches = new ArrayList<Integer>();
+        int m = length > 0 ? length : buffer.length;
+        int n = pattern.length;
 
-	private static List<Integer> match(byte[] pattern, byte[] buffer, int offset, int length, Map<Byte, Integer> rightMostIndexes)
-	{
-		if (buffer == null)
-			throw new NullPointerException("Buffer can not be null");
+        int alignedAt = offset;
+        while (alignedAt + (n - 1) < m) {
+            for (int indexInPattern = n - 1; indexInPattern >= 0; indexInPattern--) {
+                int indexInBuffer = alignedAt + indexInPattern;
+                byte x = buffer[indexInBuffer];
+                byte y = pattern[indexInPattern];
+                if (indexInBuffer >= m)
+                    break;
+                if (x != y) {
+                    Integer r = rightMostIndexes.get(x);
+                    if (r == null) {
+                        alignedAt = indexInBuffer + 1;
+                    } else {
+                        int shift = indexInBuffer - (alignedAt + r);
+                        alignedAt += shift > 0 ? shift : 1;
+                    }
+                    break;
+                } else if (indexInPattern == 0) {
+                    matches.add(alignedAt);
+                    alignedAt++;
+                }
+            }
+        }
+        return matches;
+    }
 
-		List<Integer> matches = new ArrayList<Integer>();
-		int m = length > 0 ? length : buffer.length;
-		int n = pattern.length;
+    private static Map<Byte, Integer> preprocessForBadByteShift(byte[] pattern) {
+        Map<Byte, Integer> map = new HashMap<Byte, Integer>();
+        for (int i = pattern.length - 1; i >= 0; i--) {
+            byte b = pattern[i];
+            if (!map.containsKey(b))
+                map.put(b, i);
+        }
+        return map;
+    }
 
-		int alignedAt = offset;
-		while (alignedAt + (n - 1) < m)
-		{
-			for (int indexInPattern = n - 1; indexInPattern >= 0; indexInPattern--)
-			{
-				int indexInBuffer = alignedAt + indexInPattern;
-				byte x = buffer[indexInBuffer];
-				byte y = pattern[indexInPattern];
-				if (indexInBuffer >= m)
-					break;
-				if (x != y)
-				{
-					Integer r = rightMostIndexes.get(x);
-					if (r == null)
-					{
-						alignedAt = indexInBuffer + 1;
-					}
-					else
-					{
-						int shift = indexInBuffer - (alignedAt + r);
-						alignedAt += shift > 0 ? shift : 1;
-					}
-					break;
-				}
-				else if (indexInPattern == 0)
-				{
-					matches.add(alignedAt);
-					alignedAt++;
-				}
-			}
-		}
-		return matches;
-	}
+    public List<Integer> match(byte[] buffer) {
+        return match(mPattern, buffer, 0, -1, mRightMostIndexes);
+    }
 
-	private static Map<Byte, Integer> preprocessForBadByteShift(byte[] pattern)
-	{
-		Map<Byte, Integer> map = new HashMap<Byte, Integer>();
-		for (int i = pattern.length - 1; i >= 0; i--)
-		{
-			byte b = pattern[i];
-			if (!map.containsKey(b))
-				map.put(b, i);
-		}
-		return map;
-	}
+    public List<Integer> match(byte[] buffer, int offset, int length) {
+        return match(mPattern, buffer, offset, length, mRightMostIndexes);
+    }
 }

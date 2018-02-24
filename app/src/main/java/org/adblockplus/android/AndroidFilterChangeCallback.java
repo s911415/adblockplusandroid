@@ -17,29 +17,24 @@
 
 package org.adblockplus.android;
 
+import android.content.Context;
 import org.adblockplus.libadblockplus.FilterChangeCallback;
 import org.adblockplus.libadblockplus.JsValue;
 import org.adblockplus.libadblockplus.Subscription;
 
-import android.content.Context;
+public class AndroidFilterChangeCallback extends FilterChangeCallback {
+    private final Context context;
 
-public class AndroidFilterChangeCallback extends FilterChangeCallback
-{
-  private final Context context;
-
-  public AndroidFilterChangeCallback(final Context context)
-  {
-    this.context = context;
-  }
-
-  @Override
-  public void filterChangeCallback(final String action, final JsValue jsValue)
-  {
-    if (action.equals("subscription.lastDownload") || action.equals("subscription.downloadStatus"))
-    {
-      final Subscription sub = new Subscription(jsValue);
-
-      Utils.updateSubscriptionStatus(this.context, sub);
+    public AndroidFilterChangeCallback(final Context context) {
+        this.context = context;
     }
-  }
+
+    @Override
+    public void filterChangeCallback(final String action, final JsValue jsValue) {
+        if (action.equals("subscription.lastDownload") || action.equals("subscription.downloadStatus")) {
+            final Subscription sub = new Subscription(jsValue);
+
+            Utils.updateSubscriptionStatus(this.context, sub);
+        }
+    }
 }

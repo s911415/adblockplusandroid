@@ -20,22 +20,18 @@ package org.adblockplus.android.compat;
 /**
  * Checked exception to indicate any problems/errors inside the compatibility layer (mostly reflection specific errors).
  */
-public class CompatibilityException extends Exception
-{
-  private static final long serialVersionUID = -6583503345769050560L;
+public class CompatibilityException extends Exception {
+    private static final long serialVersionUID = -6583503345769050560L;
 
-  public CompatibilityException(final String message)
-  {
-    super(message);
-  }
+    public CompatibilityException(final String message) {
+        super(message);
+    }
 
-  public CompatibilityException(final String message, final Throwable throwable)
-  {
-    super(message, throwable);
-  }
+    public CompatibilityException(final String message, final Throwable throwable) {
+        super(message, throwable);
+    }
 
-  public CompatibilityException(final Throwable throwable)
-  {
-    super(throwable);
-  }
+    public CompatibilityException(final Throwable throwable) {
+        super(throwable);
+    }
 }

@@ -17,32 +17,28 @@
 
 package org.adblockplus.brazil;
 
-import java.io.IOException;
-
 import sunlabs.brazil.server.Handler;
 import sunlabs.brazil.server.Request;
 import sunlabs.brazil.server.Server;
+
+import java.io.IOException;
 
 /**
  * Reconstructs request url to comply with proxy specification if transparent
  * proxy is used.
  */
-public class TransparentProxyHandler implements Handler
-{
+public class TransparentProxyHandler implements Handler {
 
-  @Override
-  public boolean init(final Server server, final String prefix)
-  {
-    return true;
-  }
-
-  @Override
-  public boolean respond(final Request request) throws IOException
-  {
-    if (!RequestHandler.RE_HTTP.matcher(request.url).find())
-    {
-      request.url = "http://" + request.headers.get("host") + request.url;
+    @Override
+    public boolean init(final Server server, final String prefix) {
+        return true;
     }
-    return false;
-  }
+
+    @Override
+    public boolean respond(final Request request) throws IOException {
+        if (!RequestHandler.RE_HTTP.matcher(request.url).find()) {
+            request.url = "http://" + request.headers.get("host") + request.url;
+        }
+        return false;
+    }
 }

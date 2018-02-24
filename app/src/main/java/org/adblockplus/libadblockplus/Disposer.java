@@ -21,74 +21,58 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 
-public final class Disposer extends WeakReference<Disposable>
-{
-  static final ReferenceQueue<Disposable> referenceQueue = new ReferenceQueue<Disposable>();
-  private static final HashSet<Disposer> disposerSet = new HashSet<Disposer>();
-  private final Disposable disposable;
-  private volatile boolean disposed = false;
+public final class Disposer extends WeakReference<Disposable> {
+    static final ReferenceQueue<Disposable> referenceQueue = new ReferenceQueue<Disposable>();
+    private static final HashSet<Disposer> disposerSet = new HashSet<Disposer>();
 
-  static
-  {
-    final Thread thread = new Thread(new Cleaner());
-    thread.setName(Cleaner.class.getCanonicalName());
-    thread.setDaemon(true);
-    thread.start();
-  }
-
-  public Disposer(final Disposable referent, final Disposable disposable)
-  {
-    super(referent, referenceQueue);
-    this.disposable = disposable;
-
-    synchronized (disposerSet)
-    {
-      disposerSet.add(this);
-    }
-  }
-
-  public synchronized void dispose()
-  {
-    if (!this.disposed)
-    {
-      try
-      {
-        this.disposable.dispose();
-      }
-      catch (final Throwable t)
-      {
-        // catch to set state to 'disposed' on all circumstances
-      }
-
-      this.disposed = true;
-      synchronized (disposerSet)
-      {
-        disposerSet.remove(this);
-      }
-    }
-  }
-
-  private static final class Cleaner implements Runnable
-  {
-    public Cleaner()
-    {
-      //
+    static {
+        final Thread thread = new Thread(new Cleaner());
+        thread.setName(Cleaner.class.getCanonicalName());
+        thread.setDaemon(true);
+        thread.start();
     }
 
-    @Override
-    public void run()
-    {
-      for (;;)
-      {
-        try
-        {
-          ((Disposer) Disposer.referenceQueue.remove()).dispose();
+    private final Disposable disposable;
+    private volatile boolean disposed = false;
+
+    public Disposer(final Disposable referent, final Disposable disposable) {
+        super(referent, referenceQueue);
+        this.disposable = disposable;
+
+        synchronized (disposerSet) {
+            disposerSet.add(this);
         }
-        catch (final Throwable t)
-        {
-          // ignored
-        }
-      }
     }
-  }
+
+    public synchronized void dispose() {
+        if (!this.disposed) {
+            try {
+                this.disposable.dispose();
+            } catch (final Throwable t) {
+                // catch to set state to 'disposed' on all circumstances
+            }
+
+            this.disposed = true;
+            synchronized (disposerSet) {
+                disposerSet.remove(this);
+            }
+        }
+    }
+
+    private static final class Cleaner implements Runnable {
+        public Cleaner() {
+            //
+        }
+
+        @Override
+        public void run() {
+            for (; ; ) {
+                try {
+                    ((Disposer) Disposer.referenceQueue.remove()).dispose();
+                } catch (final Throwable t) {
+                    // ignored
+                }
+            }
+        }
+    }
 }

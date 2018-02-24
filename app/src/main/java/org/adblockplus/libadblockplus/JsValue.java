@@ -19,143 +19,122 @@ package org.adblockplus.libadblockplus;
 
 import java.util.List;
 
-public class JsValue implements Disposable
-{
-  private final Disposer disposer;
-  protected final long ptr;
+public class JsValue implements Disposable {
+    static {
+        System.loadLibrary("adblockplus-jni");
+        registerNatives();
+    }
 
-  static
-  {
-    System.loadLibrary("adblockplus-jni");
-    registerNatives();
-  }
+    protected final long ptr;
+    private final Disposer disposer;
 
-  protected JsValue(final long ptr)
-  {
-    this.ptr = ptr;
-    this.disposer = new Disposer(this, new DisposeWrapper(ptr));
-  }
+    protected JsValue(final long ptr) {
+        this.ptr = ptr;
+        this.disposer = new Disposer(this, new DisposeWrapper(ptr));
+    }
 
-  @Override
-  public void dispose()
-  {
-    this.disposer.dispose();
-  }
+    private final static native void registerNatives();
 
-  public boolean isUndefined()
-  {
-    return isUndefined(this.ptr);
-  }
+    private final static native boolean isUndefined(long ptr);
 
-  public boolean isNull()
-  {
-    return isNull(this.ptr);
-  }
+    private final static native boolean isNull(long ptr);
 
-  public boolean isString()
-  {
-    return isString(this.ptr);
-  }
+    private final static native boolean isString(long ptr);
 
-  public boolean isNumber()
-  {
-    return isNumber(this.ptr);
-  }
+    private final static native boolean isNumber(long ptr);
 
-  public boolean isBoolean()
-  {
-    return isBoolean(this.ptr);
-  }
+    private final static native boolean isBoolean(long ptr);
 
-  public boolean isObject()
-  {
-    return isObject(this.ptr);
-  }
+    private final static native boolean isObject(long ptr);
 
-  public boolean isArray()
-  {
-    return isArray(this.ptr);
-  }
+    private final static native boolean isArray(long ptr);
 
-  public boolean isFunction()
-  {
-    return isFunction(this.ptr);
-  }
+    private final static native boolean isFunction(long ptr);
 
-  public String asString()
-  {
-    return asString(this.ptr);
-  }
+    private final static native String asString(long ptr);
 
-  public long asLong()
-  {
-    return asLong(this.ptr);
-  }
+    private final static native long asLong(long ptr);
 
-  public boolean asBoolean()
-  {
-    return asBoolean(this.ptr);
-  }
+    private final static native boolean asBoolean(long ptr);
 
-  public JsValue getProperty(final String name)
-  {
-    return getProperty(this.ptr, name);
-  }
+    private final static native JsValue getProperty(long ptr, String name);
 
-  public List<JsValue> asList()
-  {
-    return asList(this.ptr);
-  }
+    private final static native List<JsValue> asList(long ptr);
 
-  @Override
-  public String toString()
-  {
-    return asString(this.ptr);
-  }
+    private final static native void dtor(long ptr);
 
-  private final static class DisposeWrapper implements Disposable
-  {
-    private final long ptr;
+    @Override
+    public void dispose() {
+        this.disposer.dispose();
+    }
 
-    public DisposeWrapper(final long ptr)
-    {
-      this.ptr = ptr;
+    public boolean isUndefined() {
+        return isUndefined(this.ptr);
+    }
+
+    public boolean isNull() {
+        return isNull(this.ptr);
+    }
+
+    public boolean isString() {
+        return isString(this.ptr);
+    }
+
+    public boolean isNumber() {
+        return isNumber(this.ptr);
+    }
+
+    public boolean isBoolean() {
+        return isBoolean(this.ptr);
+    }
+
+    public boolean isObject() {
+        return isObject(this.ptr);
+    }
+
+    public boolean isArray() {
+        return isArray(this.ptr);
+    }
+
+    public boolean isFunction() {
+        return isFunction(this.ptr);
+    }
+
+    public String asString() {
+        return asString(this.ptr);
+    }
+
+    public long asLong() {
+        return asLong(this.ptr);
+    }
+
+    public boolean asBoolean() {
+        return asBoolean(this.ptr);
+    }
+
+    public JsValue getProperty(final String name) {
+        return getProperty(this.ptr, name);
+    }
+
+    public List<JsValue> asList() {
+        return asList(this.ptr);
     }
 
     @Override
-    public void dispose()
-    {
-      dtor(this.ptr);
+    public String toString() {
+        return asString(this.ptr);
     }
-  }
 
-  private final static native void registerNatives();
+    private final static class DisposeWrapper implements Disposable {
+        private final long ptr;
 
-  private final static native boolean isUndefined(long ptr);
+        public DisposeWrapper(final long ptr) {
+            this.ptr = ptr;
+        }
 
-  private final static native boolean isNull(long ptr);
-
-  private final static native boolean isString(long ptr);
-
-  private final static native boolean isNumber(long ptr);
-
-  private final static native boolean isBoolean(long ptr);
-
-  private final static native boolean isObject(long ptr);
-
-  private final static native boolean isArray(long ptr);
-
-  private final static native boolean isFunction(long ptr);
-
-  private final static native String asString(long ptr);
-
-  private final static native long asLong(long ptr);
-
-  private final static native boolean asBoolean(long ptr);
-
-  private final static native JsValue getProperty(long ptr, String name);
-
-  private final static native List<JsValue> asList(long ptr);
-
-  private final static native void dtor(long ptr);
+        @Override
+        public void dispose() {
+            dtor(this.ptr);
+        }
+    }
 }

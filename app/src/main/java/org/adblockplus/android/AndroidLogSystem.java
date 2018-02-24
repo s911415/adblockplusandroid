@@ -17,32 +17,27 @@
 
 package org.adblockplus.android;
 
+import android.util.Log;
 import org.adblockplus.libadblockplus.LogSystem;
 
-import android.util.Log;
-
-public class AndroidLogSystem extends LogSystem
-{
-  private static int abpLogLevelToAndroid(final LogLevel level)
-  {
-    switch (level)
-    {
-      default:
-      case TRACE:
-      case LOG:
-        return Log.VERBOSE;
-      case INFO:
-        return Log.INFO;
-      case WARN:
-        return Log.WARN;
-      case ERROR:
-        return Log.ERROR;
+public class AndroidLogSystem extends LogSystem {
+    private static int abpLogLevelToAndroid(final LogLevel level) {
+        switch (level) {
+            default:
+            case TRACE:
+            case LOG:
+                return Log.VERBOSE;
+            case INFO:
+                return Log.INFO;
+            case WARN:
+                return Log.WARN;
+            case ERROR:
+                return Log.ERROR;
+        }
     }
-  }
 
-  @Override
-  public void logCallback(final LogLevel level, final String message, final String source)
-  {
-    Log.println(abpLogLevelToAndroid(level), source, message);
-  }
+    @Override
+    public void logCallback(final LogLevel level, final String message, final String source) {
+        Log.println(abpLogLevelToAndroid(level), source, message);
+    }
 }

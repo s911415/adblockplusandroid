@@ -2,22 +2,22 @@
  * Format.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 2000-2006 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: cstevens.
  * Portions created by cstevens are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): cstevens, drach, suhler.
  *
  * Version:  2.7
@@ -135,26 +135,21 @@ public class Format {
      * "ghi"		=> "foo"<br>
      * "deffoojkl"	=> "baz"<br>
      * "abcbazmno"	=> "garply"<br>
-     * 
+     * <p>
      * getProperty("ghi")			=> "foo"<br>
      * getProperty("def${ghi}jkl")		=> "baz"<br>
      * getProperty("abc${def${ghi}jkl}mno")	=> "garply"<br>
      * </blockquote>
      *
-     * @param	props
-     *		The table of variables to use when substituting.
-     *
-     * @param	expr
-     *		The property name, prossibly containing substitutions.
-     *
-     * @param	defaultValue
-     *		The value to use if the top-level substitution does not
-     *		exist.  May be <code>null</code>.
+     * @param    props The table of variables to use when substituting.
+     * @param    expr The property name, prossibly containing substitutions.
+     * @param    defaultValue The value to use if the top-level substitution does not
+     * exist.  May be <code>null</code>.
      */
 
     public static String
     getProperty(Properties props, String expr, String defaultValue) {
-	return props.getProperty(subst(props, expr), defaultValue);
+        return props.getProperty(subst(props, expr), defaultValue);
     }
 
     /**
@@ -165,7 +160,7 @@ public class Format {
      * The sequence "\X" is identical to "X", except when "X" is one of:
      * <dl>
      * <dt>$<dd>A literal "$", that will not introduce a variable
-     *      substitution if it is followed by "{".
+     * substitution if it is followed by "{".
      * <dt>n<dd>Insert a NL (newline) character
      * <dt>r<dd>Insert a CR (Carriage return) character
      * <dt>"<dd>Insert a single quote (").
@@ -179,7 +174,7 @@ public class Format {
      * "ghi"		= "foo"<br>
      * "deffoojkl"	= "baz"<br>
      * "abcbazmno"	= "garply"<br>
-     * 
+     * <p>
      * subst("ghi")			    = "ghi"<br>
      * subst("def${ghi}jkl")		    = "deffoojkl"<br>
      * subst("def\${ghi}jkl")		    = "def${ghi}jkl"<br>
@@ -187,22 +182,21 @@ public class Format {
      * subst("${abc${def${ghi}jkl}mno}")    = "garply"<br>
      * </blockquote>
      *
-     * @param props	The table of variables to substitute.
-     *			If this is a Properties object, then the
-     *			getProperty() method is used instead of the
-     *			Dictionary class get() method.
-     * @param str	The expression containing the substitutions.
-     *			Embedded property names, bracketted by "${" and "}" 
-     *			are looked up in the props table and replaced with
-     *			their value.  Nested substitutions are allowed. 
-     *
-     * @return		The substituted string.  If a variable is not 
-     *			found in the table, the empty string is used.
+     * @param props The table of variables to substitute.
+     *              If this is a Properties object, then the
+     *              getProperty() method is used instead of the
+     *              Dictionary class get() method.
+     * @param str   The expression containing the substitutions.
+     *              Embedded property names, bracketted by "${" and "}"
+     *              are looked up in the props table and replaced with
+     *              their value.  Nested substitutions are allowed.
+     * @return The substituted string.  If a variable is not
+     * found in the table, the empty string is used.
      */
 
     public static String
     subst(Dictionary props, String str) {
-	return subst(props, str, false);
+        return subst(props, str, false);
     }
 
     /**
@@ -217,122 +211,124 @@ public class Format {
 
     public static String
     subst(Dictionary props, String str, boolean noEsc) {
-	if (str == null) {
-	    return null;
-	}
-	return subst(props, new Chars(str), noEsc);
+        if (str == null) {
+            return null;
+        }
+        return subst(props, new Chars(str), noEsc);
     }
 
 
     private static String subst(Dictionary dict, Chars chars, boolean esc) {
-	StringBuffer sb = new StringBuffer();
-	char c;
-	char save;
-	String result;
-	String value;
+        StringBuffer sb = new StringBuffer();
+        char c;
+        char save;
+        String result;
+        String value;
 
-	loop: while (true) {
-	    c = chars.get();
-	    switch (c) {
-	    case Chars.NUL:
-		break loop;
-	    case '$':
-		c = chars.get();
-		switch (c) {
-		case Chars.NUL:
-		    sb.append('$');
-		    break loop;
-		case '{':
-		    save = chars.setend('}');
-		    result = subst(dict, chars, esc);
-		    chars.setend(save);
-		    value = getProperty(dict, result);
-		    sb.append(value);
-		    break;
-		default:
-		    chars.pushback();
-		    sb.append('$');
-		    break;
-		}
-		break;
-	    case '\\':
-		c = chars.getraw();
-		if (c == Chars.NUL) {
-		    sb.append('\\');
-		    break loop;
-		}
-		if (esc) {   // only \$ is special
-		    switch (c) {
-		    case '$':
-			break;
-		    default:
-			chars.pushback();
-			c = '\\';
-			break;
-		    }
-		} else {	// other stuff is special too
-		    switch (c) {
-		    case 'a':
-			c = '&';
-			break;
-		    case 'g':
-			c = '>';
-			break;
-		    case 'l':
-			c = '<';
-			break;
-		    case 'q':
-			c = '"';
-			break;
-		    case 's':
-			c = ' ';
-			break;
-		    case 'v':
-			c = '\'';
-			break;
-		    case 'n':
-			c = '\n';
-			break;
-		    case 'r':
-			c = '\r';
-			break;
-		    case 't':
-			c = '\t';
-			break;
-		    default:
-			break;
-		    }
-		}
-		sb.append(c);
-		break;
-	    default:
-		sb.append(c);
-		break;
-	    }
-	}
-	return sb.toString();
+        loop:
+        while (true) {
+            c = chars.get();
+            switch (c) {
+                case Chars.NUL:
+                    break loop;
+                case '$':
+                    c = chars.get();
+                    switch (c) {
+                        case Chars.NUL:
+                            sb.append('$');
+                            break loop;
+                        case '{':
+                            save = chars.setend('}');
+                            result = subst(dict, chars, esc);
+                            chars.setend(save);
+                            value = getProperty(dict, result);
+                            sb.append(value);
+                            break;
+                        default:
+                            chars.pushback();
+                            sb.append('$');
+                            break;
+                    }
+                    break;
+                case '\\':
+                    c = chars.getraw();
+                    if (c == Chars.NUL) {
+                        sb.append('\\');
+                        break loop;
+                    }
+                    if (esc) {   // only \$ is special
+                        switch (c) {
+                            case '$':
+                                break;
+                            default:
+                                chars.pushback();
+                                c = '\\';
+                                break;
+                        }
+                    } else {    // other stuff is special too
+                        switch (c) {
+                            case 'a':
+                                c = '&';
+                                break;
+                            case 'g':
+                                c = '>';
+                                break;
+                            case 'l':
+                                c = '<';
+                                break;
+                            case 'q':
+                                c = '"';
+                                break;
+                            case 's':
+                                c = ' ';
+                                break;
+                            case 'v':
+                                c = '\'';
+                                break;
+                            case 'n':
+                                c = '\n';
+                                break;
+                            case 'r':
+                                c = '\r';
+                                break;
+                            case 't':
+                                c = '\t';
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    sb.append(c);
+                    break;
+                default:
+                    sb.append(c);
+                    break;
+            }
+        }
+        return sb.toString();
     }
+
     private static String getProperty(Dictionary dict, String name) {
-	int hash = name.indexOf('#');
-	String def = "";
-	
-	if (hash >= 0) {
-	    def = name.substring(hash + 1);
-	    name = name.substring(0, hash);
-	}
+        int hash = name.indexOf('#');
+        String def = "";
 
-	Object obj;
-	if (dict instanceof Properties) {
-	    obj = ((Properties) dict).getProperty(name);
-	} else {
-	    obj = dict.get(name);
-	}
-	String value = (obj == null) ? null : obj.toString();
+        if (hash >= 0) {
+            def = name.substring(hash + 1);
+            name = name.substring(0, hash);
+        }
 
-	if (value == null || value.length() == 0)
-	    value = def;
+        Object obj;
+        if (dict instanceof Properties) {
+            obj = ((Properties) dict).getProperty(name);
+        } else {
+            obj = dict.get(name);
+        }
+        String value = (obj == null) ? null : obj.toString();
 
-	return value;
+        if (value == null || value.length() == 0)
+            value = def;
+
+        return value;
     }
 
     /**
@@ -341,12 +337,12 @@ public class Format {
      */
 
     public static boolean isTrue(String s) {
-	if (s != null) {
-	    String v = s.trim().toLowerCase();
-	    return v.equals("true") || v.equals("yes") ||
-	           v.equals("on") || v.equals("1");
-	}
-	return false;
+        if (s != null) {
+            String v = s.trim().toLowerCase();
+            return v.equals("true") || v.equals("yes") ||
+                    v.equals("on") || v.equals("1");
+        }
+        return false;
     }
 
     /**
@@ -355,12 +351,12 @@ public class Format {
      */
 
     public static boolean isFalse(String s) {
-	if (s != null) {
-	    String v = s.trim().toLowerCase();
-	    return v.equals("false") || v.equals("no") ||
-	           v.equals("off") || v.equals("0");
-	}
-	return false;
+        if (s != null) {
+            String v = s.trim().toLowerCase();
+            return v.equals("false") || v.equals("no") ||
+                    v.equals("off") || v.equals("0");
+        }
+        return false;
     }
 
     /**
@@ -368,15 +364,15 @@ public class Format {
      */
 
     public static String deQuote(String str) {
-	int len;
-	if (str==null || (len=str.length()) < 2) {
-	    return str;
-	}
-	char ch = str.charAt(0);
-	if (((ch == '"') || (ch == '\'')) && (str.charAt(len-1) == ch)) {
-	    return str.substring(1, len-1);
-	}
-	return str;
+        int len;
+        if (str == null || (len = str.length()) < 2) {
+            return str;
+        }
+        char ch = str.charAt(0);
+        if (((ch == '"') || (ch == '\'')) && (str.charAt(len - 1) == ch)) {
+            return str.substring(1, len - 1);
+        }
+        return str;
     }
 
     /**
@@ -385,28 +381,44 @@ public class Format {
      */
 
     public static String unsubst(String data) {
-	String TOKENS = "<>&\"\'\n\t";
+        String TOKENS = "<>&\"\'\n\t";
 
-	StringTokenizer st = new StringTokenizer(data, TOKENS, true);
-	StringBuffer sb = new StringBuffer();
-	while (st.hasMoreTokens()) {
-	    String token = st.nextToken();
-	    if (token.length() > 0) {
-		sb.append(token);
-	    } else {
-		switch(token.charAt(0)) {
-		    case '<': sb.append("\\l"); break;
-		    case '>': sb.append("\\g"); break;
-		    case '&': sb.append("\\a"); break;
-		    case '\"': sb.append("\\q"); break;
-		    case '\'': sb.append("\\v"); break;
-		    case '\n': sb.append("\\n"); break;
-		    case '\t': sb.append("\\t"); break;
-		    default: sb.append(token); break;
-		}
-	    }
-	}
-	return sb.toString();
+        StringTokenizer st = new StringTokenizer(data, TOKENS, true);
+        StringBuffer sb = new StringBuffer();
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if (token.length() > 0) {
+                sb.append(token);
+            } else {
+                switch (token.charAt(0)) {
+                    case '<':
+                        sb.append("\\l");
+                        break;
+                    case '>':
+                        sb.append("\\g");
+                        break;
+                    case '&':
+                        sb.append("\\a");
+                        break;
+                    case '\"':
+                        sb.append("\\q");
+                        break;
+                    case '\'':
+                        sb.append("\\v");
+                        break;
+                    case '\n':
+                        sb.append("\\n");
+                        break;
+                    case '\t':
+                        sb.append("\\t");
+                        break;
+                    default:
+                        sb.append(token);
+                        break;
+                }
+            }
+        }
+        return sb.toString();
     }
 
 }
@@ -418,32 +430,32 @@ class Chars {
     private char[] chars;
 
     Chars(String s) {
-	i = 0;
-	end = NUL;
-	chars = s.toCharArray();
+        i = 0;
+        end = NUL;
+        chars = s.toCharArray();
     }
 
     char getraw() {
-	if (i >= chars.length)
-	    return NUL;
-	return chars[i++];
+        if (i >= chars.length)
+            return NUL;
+        return chars[i++];
     }
 
     char get() {
-	char c = getraw();
-	if (c == end)
-	    return NUL;
-	return c;
+        char c = getraw();
+        if (c == end)
+            return NUL;
+        return c;
     }
 
     void pushback() {
-	if (--i < 0)
-	    i = 0;
+        if (--i < 0)
+            i = 0;
     }
 
     char setend(char end) {
-	char save = this.end;
-	this.end = end;
-	return save;
+        char save = this.end;
+        this.end = end;
+        return save;
     }
 }

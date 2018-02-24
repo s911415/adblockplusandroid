@@ -17,29 +17,25 @@
 
 package org.adblockplus.android;
 
+import android.content.Context;
+import android.util.Log;
 import org.adblockplus.libadblockplus.UpdateCheckDoneCallback;
 import org.apache.commons.lang.StringUtils;
 
-import android.content.Context;
-import android.util.Log;
+public class AndroidUpdateCheckDoneCallback extends UpdateCheckDoneCallback {
+    private static final String TAG = Utils.getTag(AndroidUpdateCheckDoneCallback.class);
 
-public class AndroidUpdateCheckDoneCallback extends UpdateCheckDoneCallback
-{
-  private static final String TAG = Utils.getTag(AndroidUpdateCheckDoneCallback.class);
+    private final Context context;
 
-  private final Context context;
+    public AndroidUpdateCheckDoneCallback(final Context context) {
+        this.context = context;
+    }
 
-  public AndroidUpdateCheckDoneCallback(final Context context)
-  {
-    this.context = context;
-  }
-
-  @Override
-  public void updateCheckDoneCallback(final String error)
-  {
-    if (StringUtils.isEmpty(error))
-      return;
-    Log.e(TAG, "Update check failed: " + error);
-    Utils.showUpdateNotification(this.context, null, error);
-  }
+    @Override
+    public void updateCheckDoneCallback(final String error) {
+        if (StringUtils.isEmpty(error))
+            return;
+        Log.e(TAG, "Update check failed: " + error);
+        Utils.showUpdateNotification(this.context, null, error);
+    }
 }

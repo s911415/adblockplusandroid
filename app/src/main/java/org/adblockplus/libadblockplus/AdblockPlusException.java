@@ -17,22 +17,18 @@
 
 package org.adblockplus.libadblockplus;
 
-public class AdblockPlusException extends RuntimeException
-{
-  private static final long serialVersionUID = -8127654134450836743L;
+public class AdblockPlusException extends RuntimeException {
+    private static final long serialVersionUID = -8127654134450836743L;
 
-  public AdblockPlusException(final String message)
-  {
-    super(message);
-  }
+    public AdblockPlusException(final String message) {
+        super(message);
+    }
 
-  public AdblockPlusException(final String message, final Throwable throwable)
-  {
-    super(message, throwable);
-  }
+    public AdblockPlusException(final String message, final Throwable throwable) {
+        super(message, throwable);
+    }
 
-  public AdblockPlusException(final Throwable throwable)
-  {
-    super(throwable);
-  }
+    public AdblockPlusException(final Throwable throwable) {
+        super(throwable);
+    }
 }

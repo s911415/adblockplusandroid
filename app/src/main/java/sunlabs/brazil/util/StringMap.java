@@ -2,22 +2,22 @@
  * StringMap.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 1999-2007 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: cstevens.
  * Portions created by cstevens are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): cstevens, suhler.
  *
  * Version:  2.5
@@ -86,7 +86,7 @@
 
 package sunlabs.brazil.util;
 
-import java.util.Dictionary;    
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -96,59 +96,51 @@ import java.util.Vector;
  * <li> Maps case-insensitive string keys to string values.
  * <li> The case of the keys is preserved.
  * <li> Values may be <code>null</code>.
- * <li> Preserves the relative order of the data.  
+ * <li> Preserves the relative order of the data.
  * <li> The same key may appear multiple times in a single map.
  * <li> This map is implemented via a Vector, and as such, as the number of
- *      keys increases, the time required to search will go up.
+ * keys increases, the time required to search will go up.
  * </ul>
  *
- * @author	Colin Stevens (colin.stevens@sun.com)
- * @version		2.5
+ * @author Colin Stevens (colin.stevens@sun.com)
+ * @version 2.5
  */
 public class StringMap
-    extends Dictionary
-{
+        extends Dictionary {
     Vector keys;
     Vector values;
 
     /**
      * Creates an empty StringMap.
      */
-    public
-    StringMap()
-    {
-	keys = new Vector();
-	values = new Vector();
+    public StringMap() {
+        keys = new Vector();
+        values = new Vector();
     }
 
     /**
      * Returns the number of elements in this StringMap.  Every occurrence of
      * keys that appear multiple times is counted.
      *
-     * @return	The number of elements in this StringMap.
-     *
-     * @see	#keys
-     *
-     * @implements	Dictionary#size
+     * @return The number of elements in this StringMap.
+     * @see    #keys
+     * @implements Dictionary#size
      */
     public int
-    size()
-    {
-	return keys.size();
+    size() {
+        return keys.size();
     }
 
     /**
      * Tests if there are any elements in this StringMap.
      *
-     * @return	Returns <code>true</code> if there are no elements,
-     *		<code>false</code> otherwise.
-     *
-     * @implements	Dictionary#isEmpty
+     * @return Returns <code>true</code> if there are no elements,
+     * <code>false</code> otherwise.
+     * @implements Dictionary#isEmpty
      */
     public boolean
-    isEmpty()
-    {
-	return keys.isEmpty();
+    isEmpty() {
+        return keys.isEmpty();
     }
 
     /**
@@ -176,35 +168,29 @@ public class StringMap
      * }
      * </pre>
      *
-     * @return	An enumeration of the keys.
-     * 
-     * @see	#elements
-     * @see	#size
-     * @see	#getKey
-     * @see	#get
-     *
-     * @implements	Dictionary#keys
+     * @return An enumeration of the keys.
+     * @see    #elements
+     * @see    #size
+     * @see    #getKey
+     * @see    #get
+     * @implements Dictionary#keys
      */
     public Enumeration
-    keys()
-    {
-	return keys.elements();
+    keys() {
+        return keys.elements();
     }
 
     /**
      * Returns an enumeration of the values in this StringMap.  The elements
      * of the enumeration are strings.
-     * 
-     * @return	An enumeration of the values.
      *
-     * @see	#keys
-     *
-     * @implements	Dictionary#elements
+     * @return An enumeration of the values.
+     * @see    #keys
+     * @implements Dictionary#elements
      */
     public Enumeration
-    elements()
-    {
-	return values.elements();
+    elements() {
+        return values.elements();
     }
 
     /**
@@ -215,19 +201,14 @@ public class StringMap
      * StringMap in the order in which they were inserted, subject to any
      * intervening deletions.
      *
-     * @param	index
-     *		The index of the key.
-     *
-     * @return	The key at the specified index.
-     *
-     * @throws	IndexOutOfBoundsException
-     *		if the index is out of the allowed range.
+     * @param    index The index of the key.
+     * @return The key at the specified index.
+     * @throws IndexOutOfBoundsException if the index is out of the allowed range.
      */
     public String
     getKey(int index)
-	throws IndexOutOfBoundsException
-    {
-	return (String) keys.elementAt(index);
+            throws IndexOutOfBoundsException {
+        return (String) keys.elementAt(index);
     }
 
     /**
@@ -238,19 +219,14 @@ public class StringMap
      * StringMap in the order in which they were inserted, subject to any
      * intervening deletions.
      *
-     * @param	index
-     *		The index of the key.
-     *
-     * @return	The value at the specified index.
-     *
-     * @throws	IndexOutOfBoundsException
-     *		if the index is out of the allowed range.
+     * @param    index The index of the key.
+     * @return The value at the specified index.
+     * @throws IndexOutOfBoundsException if the index is out of the allowed range.
      */
     public String
     get(int index)
-	throws IndexOutOfBoundsException
-    {
-	return (String) values.elementAt(index);
+            throws IndexOutOfBoundsException {
+        return (String) values.elementAt(index);
     }
 
     /**
@@ -263,61 +239,49 @@ public class StringMap
      * it is necessary to iterate over the entire StringMap to retrieve
      * all the values associated with a given key.
      *
-     * @param	key
-     *		A key in this StringMap.  May not be <code>null</code>.
-     *
-     * @return	The value to which the specified key is mapped, or
-     *		<code>null</code> if the key is not in the StringMap.
-     *
-     * @see	#keys
+     * @param    key A key in this StringMap.  May not be <code>null</code>.
+     * @return The value to which the specified key is mapped, or
+     * <code>null</code> if the key is not in the StringMap.
+     * @see    #keys
      */
     public String
     get(String key) {
-	return get(key, null);
+        return get(key, null);
     }
 
     /**
      * Returns the value that the specified case-insensitive key maps to
      * in this StringMap.
-     * @param	key
-     *		A key in this StringMap.  May not be <code>null</code>.
-     * @param	dflt
-     *		A default value if the entry for <code>key</code> is not found.
      *
-     * @return	The value to which the specified key is mapped, or
-     *		<code>dflt</code> if the key is not in the StringMap.
+     * @param    key A key in this StringMap.  May not be <code>null</code>.
+     * @param    dflt A default value if the entry for <code>key</code> is not found.
+     * @return The value to which the specified key is mapped, or
+     * <code>dflt</code> if the key is not in the StringMap.
      */
 
     public String
     get(String key, String dflt) {
-	int i = indexOf(key);
-	if (i >= 0) {
-	    return (String) values.elementAt(i);
-	} else {
-	    return dflt;
-	}
+        int i = indexOf(key);
+        if (i >= 0) {
+            return (String) values.elementAt(i);
+        } else {
+            return dflt;
+        }
     }
 
     /**
      * Performs the same job as <code>get(String)</code>.  It exists so
      * this class can extend the <code>Dictionary</code> class.
-     * 
-     * @param	key
-     *		Must be a String.
      *
-     * @return	A String value.
-     *
-     * @throws	ClassCastException
-     *		if the <code>key</code> is not a String.
-     *
-     * @see	#get(String)
-     *
-     * @implements	Dictionary#get
+     * @param    key Must be a String.
+     * @return A String value.
+     * @throws ClassCastException if the <code>key</code> is not a String.
+     * @see    #get(String)
+     * @implements Dictionary#get
      */
     public Object
-    get(Object key)
-    {
-	return get((String) key);
+    get(Object key) {
+        return get((String) key);
     }
 
     /**
@@ -325,18 +289,13 @@ public class StringMap
      * StringMap.  The index ranges from <code>0</code> to
      * <code>size() - 1</code>.
      *
-     * @param	index
-     *		The index of the key.
-     *
-     * @return	The value at the specified index.
-     *
-     * @throws	IndexOutOfBoundsException
-     *		if the index is out of the allowed range.
+     * @param    index The index of the key.
+     * @return The value at the specified index.
+     * @throws IndexOutOfBoundsException if the index is out of the allowed range.
      */
     public void
-    put(int index, String value)
-    {
-	values.setElementAt(value, index);
+    put(int index, String value) {
+        values.setElementAt(value, index);
     }
 
     /**
@@ -351,68 +310,54 @@ public class StringMap
      * The case of the prior key is retained in that case.  Otherwise
      * the case of the new key is used.
      *
-     * @param	key
-     *		The new key.  May not be <code>null</code>.
-     *
-     * @param	value
-     *		The new value.  May be <code>null</code>.
-     *
-     * @return	The previous value to which <code>key</code> was mapped,
-     *		or <code>null</code> if the the key did not map to any
-     *		value.
+     * @param    key The new key.  May not be <code>null</code>.
+     * @param    value The new value.  May be <code>null</code>.
+     * @return The previous value to which <code>key</code> was mapped,
+     * or <code>null</code> if the the key did not map to any
+     * value.
      */
     public void
-    put(String key, String value)
-    {
-	int i = indexOf(key);
-	if (i < 0) {
-	    keys.addElement(key);
-	    values.addElement(value);
-	} else {
-	    values.setElementAt(value, i);
-	}
+    put(String key, String value) {
+        int i = indexOf(key);
+        if (i < 0) {
+            keys.addElement(key);
+            values.addElement(value);
+        } else {
+            values.setElementAt(value, i);
+        }
     }
 
     /**
      * Performs the same job as <code>put(String, String)</code>.  It exists
      * so this class can extend the <code>Dictionary</code> class.
      *
-     * @param	key
-     *		Must be a String.
-     *
-     * @param	value
-     *		Must be a String.
-     *
-     * @return	The previous value to which <code>key</code> was mapped,
-     *		or <code>null</code> if the the key did not map to any
-     *		value.
-     *
-     * @throws	ClassCastException
-     *		if the <code>key</code> or <code>value</code> is not a
-     *		String.
-     *
-     * @see	#put(String, String)
-     *
-     * @implements	Dictionary#put
+     * @param    key Must be a String.
+     * @param    value Must be a String.
+     * @return The previous value to which <code>key</code> was mapped,
+     * or <code>null</code> if the the key did not map to any
+     * value.
+     * @throws ClassCastException if the <code>key</code> or <code>value</code> is not a
+     * String.
+     * @see    #put(String, String)
+     * @implements Dictionary#put
      */
     public Object
-    put(Object key, Object value)
-    {
-	String skey = (String) key;
-	String svalue = (String) value;
+    put(Object key, Object value) {
+        String skey = (String) key;
+        String svalue = (String) value;
 
-	Object prior;
+        Object prior;
 
-	int i = indexOf(skey);
-	if (i < 0) {
-	    prior = null;
-	    keys.addElement(skey);
-	    values.addElement(svalue);
-	} else {
-	    prior = values.elementAt(i);
-	    values.setElementAt(svalue, i);
-	}
-	return prior;
+        int i = indexOf(skey);
+        if (i < 0) {
+            prior = null;
+            keys.addElement(skey);
+            values.addElement(svalue);
+        } else {
+            prior = values.elementAt(i);
+            values.setElementAt(svalue, i);
+        }
+        return prior;
     }
 
     /**
@@ -427,20 +372,15 @@ public class StringMap
      * is necessary to iterate over the entire StringMap to retrieve all
      * values associated with a given key.
      *
-     * @param	key
-     *		The new key.  May not be <code>null</code>.
-     *
-     * @param	value
-     *		The new value.  May be <code>null</code>.
-     *
-     * @see	#put(String, String)
-     * @see	#keys
+     * @param    key The new key.  May not be <code>null</code>.
+     * @param    value The new value.  May be <code>null</code>.
+     * @see    #put(String, String)
+     * @see    #keys
      */
     public void
-    add(String key, String value)
-    {
-	keys.addElement(key);
-	values.addElement(value);
+    add(String key, String value) {
+        keys.addElement(key);
+        values.addElement(value);
     }
 
     /**
@@ -451,92 +391,82 @@ public class StringMap
      * The same key may appear in multiple times in this StringMap; this
      * method only removes the first occurrence of the key.
      *
-     * @param	key
-     *		The key that needs to be removed.  Must not be
-     *		<code>null</code>.
+     * @param    key The key that needs to be removed.  Must not be
+     * <code>null</code>.
      */
     public void
-    remove(String key)
-    {
-	int i = indexOf(key);
-	if (i >= 0) {
-	    remove(i);
-	}
+    remove(String key) {
+        int i = indexOf(key);
+        if (i >= 0) {
+            remove(i);
+        }
     }
 
     public void
-    remove(int i)
-    {
-	keys.removeElementAt(i);
-	values.removeElementAt(i);
+    remove(int i) {
+        keys.removeElementAt(i);
+        values.removeElementAt(i);
     }
 
     /**
      * Performs the same job as <code>remove(String)</code>.  It exists so
      * this class can extend the <code>Dictionary</code> class.
      *
-     * @param	key
-     *		Must be a String.
-     *
-     * @return	The string value to which the key had been mapped, or
-     *		<code>null</code> if the key did not have a mapping.
-     *
-     * @throws	ClassCastException
-     *		if the <code>key</code> is not a String.
-     *
-     * @implements	Dictionary#remove
+     * @param    key Must be a String.
+     * @return The string value to which the key had been mapped, or
+     * <code>null</code> if the key did not have a mapping.
+     * @throws ClassCastException if the <code>key</code> is not a String.
+     * @implements Dictionary#remove
      */
     public Object
-    remove(Object key)
-    {
-	int i = indexOf((String) key);
-	if (i >= 0) {
-	    Object prior = values.elementAt(i);
-	    remove(i);
-	    return prior;
-	}
-	return null;
+    remove(Object key) {
+        int i = indexOf((String) key);
+        if (i >= 0) {
+            Object prior = values.elementAt(i);
+            remove(i);
+            return prior;
+        }
+        return null;
     }
 
     /**
      * Removes all the keys and values from this StringMap.
      */
     public void
-    clear()
-    {
-	keys.setSize(0);
-	values.setSize(0);
+    clear() {
+        keys.setSize(0);
+        values.setSize(0);
     }
 
     private int
-    indexOf(String key)
-    {
-	int length = keys.size();
-	for (int i = 0; i < length; i++) {
-	    String got = (String) keys.elementAt(i);
-	    if (key.equalsIgnoreCase(got)) {
-		return i;
-	    }
-	}
-	return -1;
+    indexOf(String key) {
+        int length = keys.size();
+        for (int i = 0; i < length; i++) {
+            String got = (String) keys.elementAt(i);
+            if (key.equalsIgnoreCase(got)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
      * Append another Stringmap onto this one.
-     * @param other	the map to append to this one
-     * @param noReplace	should existing values be replaced?
+     *
+     * @param other     the map to append to this one
+     * @param noReplace should existing values be replaced?
      */
 
     public void
     append(StringMap other, boolean noReplace) {
-	int size = (other != null) ? other.size() : 0;
-	for (int i = 0; i < size; i++) {
-	    if (noReplace) {
+        int size = (other != null) ? other.size() : 0;
+        for (int i = 0; i < size; i++) {
+            if (noReplace) {
                 add(other.getKey(i), other.get(i));
-	    } else {
+            } else {
                 put(other.getKey(i), other.get(i));
             }
-	}
+        }
     }
 
     /**
@@ -545,27 +475,26 @@ public class StringMap
      * characters ", ".  Each entry is rendered as the key, an equals sign
      * "=", and the associated value.
      *
-     * @return	The string representation of this <code>StringMap</code>.
+     * @return The string representation of this <code>StringMap</code>.
      */
     public String
-    toString()
-    {
-	StringBuffer sb = new StringBuffer();
+    toString() {
+        StringBuffer sb = new StringBuffer();
 
-	sb.append('{');
+        sb.append('{');
 
-	int length = keys.size();
-	for (int i = 0; i < length; i++) {
-	    sb.append(getKey(i));
-	    sb.append('=');
-	    sb.append(get(i));
-	    sb.append(", ");
-	}
-	if (sb.length() > 1) {
-	    sb.setLength(sb.length() - 2);
-	}
-	sb.append('}');
+        int length = keys.size();
+        for (int i = 0; i < length; i++) {
+            sb.append(getKey(i));
+            sb.append('=');
+            sb.append(get(i));
+            sb.append(", ");
+        }
+        if (sb.length() > 1) {
+            sb.setLength(sb.length() - 2);
+        }
+        sb.append('}');
 
-	return sb.toString();
+        return sb.toString();
     }
 }

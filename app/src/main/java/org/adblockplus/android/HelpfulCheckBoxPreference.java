@@ -28,63 +28,50 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import org.adblockplus.android.R;
+public class HelpfulCheckBoxPreference extends CheckBoxPreference {
+    private OnClickListener helpClickListener;
+    private String url;
 
-public class HelpfulCheckBoxPreference extends CheckBoxPreference
-{
-  private OnClickListener helpClickListener;
-  private String url;
-
-  public HelpfulCheckBoxPreference(final Context context, final AttributeSet attrs)
-  {
-    super(context, attrs);
-  }
-
-  @Override
-  protected void onBindView(final View view)
-  {
-    super.onBindView(view);
-
-    final ImageView helpImage = new ImageView(getContext());
-    final ViewGroup widgetFrameView = ((ViewGroup) view.findViewById(android.R.id.widget_frame));
-    if (widgetFrameView == null)
-      return;
-    widgetFrameView.setVisibility(View.VISIBLE);
-    final int rightPaddingDip = android.os.Build.VERSION.SDK_INT < 14 ? 8 : 5;
-    final float mDensity = getContext().getResources().getDisplayMetrics().density;
-    if (widgetFrameView instanceof LinearLayout)
-    {
-      ((LinearLayout) widgetFrameView).setOrientation(LinearLayout.HORIZONTAL);
+    public HelpfulCheckBoxPreference(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
     }
-    widgetFrameView.addView(helpImage, 0);
-    helpImage.setImageResource(R.drawable.ic_menu_help);
-    helpImage.setPadding(helpImage.getPaddingLeft(), helpImage.getPaddingTop(), (int) (mDensity * rightPaddingDip), helpImage.getPaddingBottom());
-    helpImage.setOnClickListener(new OnClickListener()
-    {
-      @Override
-      public void onClick(final View v)
-      {
-        if (helpClickListener != null)
-        {
-          helpClickListener.onClick(helpImage);
-        }
-        else if (url != null)
-        {
-          final Uri uri = Uri.parse(url);
-          final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-          HelpfulCheckBoxPreference.this.getContext().startActivity(intent);
-        }
-      }
-    });
-  }
 
-  public void setOnHelpClickListener(final OnClickListener l)
-  {
-    helpClickListener = l;
-  }
+    @Override
+    protected void onBindView(final View view) {
+        super.onBindView(view);
 
-  public void setHelpUrl(final String url)
-  {
-    this.url = url;
-  }
+        final ImageView helpImage = new ImageView(getContext());
+        final ViewGroup widgetFrameView = ((ViewGroup) view.findViewById(android.R.id.widget_frame));
+        if (widgetFrameView == null)
+            return;
+        widgetFrameView.setVisibility(View.VISIBLE);
+        final int rightPaddingDip = android.os.Build.VERSION.SDK_INT < 14 ? 8 : 5;
+        final float mDensity = getContext().getResources().getDisplayMetrics().density;
+        if (widgetFrameView instanceof LinearLayout) {
+            ((LinearLayout) widgetFrameView).setOrientation(LinearLayout.HORIZONTAL);
+        }
+        widgetFrameView.addView(helpImage, 0);
+        helpImage.setImageResource(R.drawable.ic_menu_help);
+        helpImage.setPadding(helpImage.getPaddingLeft(), helpImage.getPaddingTop(), (int) (mDensity * rightPaddingDip), helpImage.getPaddingBottom());
+        helpImage.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (helpClickListener != null) {
+                    helpClickListener.onClick(helpImage);
+                } else if (url != null) {
+                    final Uri uri = Uri.parse(url);
+                    final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    HelpfulCheckBoxPreference.this.getContext().startActivity(intent);
+                }
+            }
+        });
+    }
+
+    public void setOnHelpClickListener(final OnClickListener l) {
+        helpClickListener = l;
+    }
+
+    public void setHelpUrl(final String url) {
+        this.url = url;
+    }
 }

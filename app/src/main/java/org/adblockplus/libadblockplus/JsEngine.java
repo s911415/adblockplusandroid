@@ -19,154 +19,131 @@ package org.adblockplus.libadblockplus;
 
 import java.util.List;
 
-public final class JsEngine implements Disposable
-{
-  private final Disposer disposer;
-  protected final long ptr;
-
-  static
-  {
-    System.loadLibrary("adblockplus-jni");
-    registerNatives();
-  }
-
-  public JsEngine(final AppInfo appInfo)
-  {
-    this(ctor(appInfo));
-  }
-
-  protected JsEngine(final long ptr)
-  {
-    this.ptr = ptr;
-    this.disposer = new Disposer(this, new DisposeWrapper(ptr));
-  }
-
-  public void setEventCallback(final String eventName, final EventCallback callback)
-  {
-    setEventCallback(this.ptr, eventName, callback.ptr);
-  }
-
-  public void removeEventCallback(final String eventName)
-  {
-    removeEventCallback(this.ptr, eventName);
-  }
-
-  public JsValue evaluate(final String source, final String filename)
-  {
-    return evaluate(this.ptr, source, filename);
-  }
-
-  public JsValue evaluate(final String source)
-  {
-    return evaluate(this.ptr, source, "");
-  }
-
-  public void triggerEvent(final String eventName, final List<JsValue> params)
-  {
-    final long[] args = new long[params.size()];
-
-    for (int i = 0; i < args.length; i++)
-    {
-      args[i] = params.get(i).ptr;
+public final class JsEngine implements Disposable {
+    static {
+        System.loadLibrary("adblockplus-jni");
+        registerNatives();
     }
 
-    triggerEvent(this.ptr, eventName, args);
-  }
+    protected final long ptr;
+    private final Disposer disposer;
 
-  public void triggerEvent(final String eventName)
-  {
-    triggerEvent(this.ptr, eventName, null);
-  }
+    public JsEngine(final AppInfo appInfo) {
+        this(ctor(appInfo));
+    }
 
-  public void setDefaultFileSystem(final String basePath)
-  {
-    setDefaultFileSystem(this.ptr, basePath);
-  }
+    protected JsEngine(final long ptr) {
+        this.ptr = ptr;
+        this.disposer = new Disposer(this, new DisposeWrapper(ptr));
+    }
 
-  public void setDefaultLogSystem()
-  {
-    setDefaultLogSystem(this.ptr);
-  }
+    private final static native void registerNatives();
 
-  public void setLogSystem(final LogSystem logSystem)
-  {
-    setLogSystem(this.ptr, logSystem.ptr);
-  }
+    private final static native long ctor(AppInfo appInfo);
 
-  public void setDefaultWebRequest()
-  {
-    setDefaultWebRequest(this.ptr);
-  }
+    private final static native void setEventCallback(long ptr, String eventName, long callback);
 
-  public void setWebRequest(final WebRequest webRequest)
-  {
-    setWebRequest(this.ptr, webRequest.ptr);
-  }
+    private final static native void removeEventCallback(long ptr, String eventName);
 
-  public JsValue newValue(final long value)
-  {
-    return newValue(this.ptr, value);
-  }
+    private final static native JsValue evaluate(long ptr, String source, String filename);
 
-  public JsValue newValue(final boolean value)
-  {
-    return newValue(this.ptr, value);
-  }
+    private final static native void triggerEvent(long ptr, String eventName, long[] args);
 
-  public JsValue newValue(final String value)
-  {
-    return newValue(this.ptr, value);
-  }
+    private final static native void setDefaultFileSystem(long ptr, String basePath);
 
-  @Override
-  public void dispose()
-  {
-    this.disposer.dispose();
-  }
+    private final static native void setLogSystem(long ptr, long logSystemPtr);
 
-  private final static class DisposeWrapper implements Disposable
-  {
-    private final long ptr;
+    private final static native void setDefaultLogSystem(long ptr);
 
-    public DisposeWrapper(final long ptr)
-    {
-      this.ptr = ptr;
+    private final static native void setWebRequest(long ptr, long webRequestPtr);
+
+    private final static native void setDefaultWebRequest(long ptr);
+
+    private final static native JsValue newValue(long ptr, long value);
+
+    private final static native JsValue newValue(long ptr, boolean value);
+
+    private final static native JsValue newValue(long ptr, String value);
+
+    private final static native void dtor(long ptr);
+
+    public void setEventCallback(final String eventName, final EventCallback callback) {
+        setEventCallback(this.ptr, eventName, callback.ptr);
+    }
+
+    public void removeEventCallback(final String eventName) {
+        removeEventCallback(this.ptr, eventName);
+    }
+
+    public JsValue evaluate(final String source, final String filename) {
+        return evaluate(this.ptr, source, filename);
+    }
+
+    public JsValue evaluate(final String source) {
+        return evaluate(this.ptr, source, "");
+    }
+
+    public void triggerEvent(final String eventName, final List<JsValue> params) {
+        final long[] args = new long[params.size()];
+
+        for (int i = 0; i < args.length; i++) {
+            args[i] = params.get(i).ptr;
+        }
+
+        triggerEvent(this.ptr, eventName, args);
+    }
+
+    public void triggerEvent(final String eventName) {
+        triggerEvent(this.ptr, eventName, null);
+    }
+
+    public void setDefaultFileSystem(final String basePath) {
+        setDefaultFileSystem(this.ptr, basePath);
+    }
+
+    public void setDefaultLogSystem() {
+        setDefaultLogSystem(this.ptr);
+    }
+
+    public void setLogSystem(final LogSystem logSystem) {
+        setLogSystem(this.ptr, logSystem.ptr);
+    }
+
+    public void setDefaultWebRequest() {
+        setDefaultWebRequest(this.ptr);
+    }
+
+    public void setWebRequest(final WebRequest webRequest) {
+        setWebRequest(this.ptr, webRequest.ptr);
+    }
+
+    public JsValue newValue(final long value) {
+        return newValue(this.ptr, value);
+    }
+
+    public JsValue newValue(final boolean value) {
+        return newValue(this.ptr, value);
+    }
+
+    public JsValue newValue(final String value) {
+        return newValue(this.ptr, value);
     }
 
     @Override
-    public void dispose()
-    {
-      dtor(this.ptr);
+    public void dispose() {
+        this.disposer.dispose();
     }
-  }
 
-  private final static native void registerNatives();
+    private final static class DisposeWrapper implements Disposable {
+        private final long ptr;
 
-  private final static native long ctor(AppInfo appInfo);
+        public DisposeWrapper(final long ptr) {
+            this.ptr = ptr;
+        }
 
-  private final static native void setEventCallback(long ptr, String eventName, long callback);
-
-  private final static native void removeEventCallback(long ptr, String eventName);
-
-  private final static native JsValue evaluate(long ptr, String source, String filename);
-
-  private final static native void triggerEvent(long ptr, String eventName, long[] args);
-
-  private final static native void setDefaultFileSystem(long ptr, String basePath);
-
-  private final static native void setLogSystem(long ptr, long logSystemPtr);
-
-  private final static native void setDefaultLogSystem(long ptr);
-
-  private final static native void setWebRequest(long ptr, long webRequestPtr);
-
-  private final static native void setDefaultWebRequest(long ptr);
-
-  private final static native JsValue newValue(long ptr, long value);
-
-  private final static native JsValue newValue(long ptr, boolean value);
-
-  private final static native JsValue newValue(long ptr, String value);
-
-  private final static native void dtor(long ptr);
+        @Override
+        public void dispose() {
+            dtor(this.ptr);
+        }
+    }
 }

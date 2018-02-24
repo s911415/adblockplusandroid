@@ -20,121 +20,88 @@ package org.adblockplus.android.compat;
 import android.content.Context;
 import android.net.ConnectivityManager;
 
-public class LinkProperties
-{
-  private final Object linkProperties;
+public class LinkProperties {
+    private final Object linkProperties;
 
-  public LinkProperties(final Object linkProperties)
-  {
-    this.linkProperties = linkProperties;
-  }
+    public LinkProperties(final Object linkProperties) {
+        this.linkProperties = linkProperties;
+    }
 
-  public boolean isValid()
-  {
-    return this.linkProperties != null;
-  }
+    public static LinkProperties getActiveLinkProperties(final ConnectivityManager manager) throws CompatibilityException {
+        try {
+            return new LinkProperties(
+                    manager.getClass()
+                            .getMethod("getActiveLinkProperties")
+                            .invoke(manager));
+        } catch (final Throwable t) {
+            throw new CompatibilityException(t);
+        }
+    }
 
-  public static LinkProperties getActiveLinkProperties(final ConnectivityManager manager) throws CompatibilityException
-  {
-    try
-    {
-      return new LinkProperties(
-          manager.getClass()
-              .getMethod("getActiveLinkProperties")
-              .invoke(manager));
+    public static LinkProperties getLinkProperties(final ConnectivityManager manager, final int networkType) throws CompatibilityException {
+        try {
+            return new LinkProperties(
+                    manager.getClass()
+                            .getMethod("getLinkProperties", int.class)
+                            .invoke(manager, networkType));
+        } catch (final Throwable t) {
+            throw new CompatibilityException(t);
+        }
     }
-    catch (final Throwable t)
-    {
-      throw new CompatibilityException(t);
-    }
-  }
 
-  public static LinkProperties getLinkProperties(final ConnectivityManager manager, final int networkType) throws CompatibilityException
-  {
-    try
-    {
-      return new LinkProperties(
-          manager.getClass()
-              .getMethod("getLinkProperties", int.class)
-              .invoke(manager, networkType));
+    public static LinkProperties fromContext(final Context context) {
+        try {
+            return getActiveLinkProperties(((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)));
+        } catch (final CompatibilityException e) {
+            return null;
+        }
     }
-    catch (final Throwable t)
-    {
-      throw new CompatibilityException(t);
-    }
-  }
 
-  public static LinkProperties fromContext(final Context context)
-  {
-    try
-    {
-      return getActiveLinkProperties(((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)));
+    public boolean isValid() {
+        return this.linkProperties != null;
     }
-    catch (final CompatibilityException e)
-    {
-      return null;
-    }
-  }
 
-  public Object getLinkProperties()
-  {
-    return this.linkProperties;
-  }
+    public Object getLinkProperties() {
+        return this.linkProperties;
+    }
 
-  public String getInterfaceName() throws CompatibilityException
-  {
-    try
-    {
-      return (String) Class.forName("android.net.LinkProperties")
-          .getMethod("getInterfaceName")
-          .invoke(this.linkProperties);
+    public String getInterfaceName() throws CompatibilityException {
+        try {
+            return (String) Class.forName("android.net.LinkProperties")
+                    .getMethod("getInterfaceName")
+                    .invoke(this.linkProperties);
+        } catch (final Throwable t) {
+            throw new CompatibilityException(t);
+        }
     }
-    catch (final Throwable t)
-    {
-      throw new CompatibilityException(t);
-    }
-  }
 
-  public void setHttpProxy(final ProxyProperties proxyProperties) throws CompatibilityException
-  {
-    try
-    {
-      Class.forName("android.net.LinkProperties")
-          .getMethod("setHttpProxy", Class.forName("android.net.ProxyProperties"))
-          .invoke(this.linkProperties, proxyProperties != null ? proxyProperties.toAndroidNetProxyProperties() : null);
+    public ProxyProperties getHttpProxy() throws CompatibilityException {
+        try {
+            return ProxyProperties.fromObject(
+                    Class.forName("android.net.LinkProperties")
+                            .getMethod("getHttpProxy")
+                            .invoke(this.linkProperties));
+        } catch (final CompatibilityException e) {
+            throw e;
+        } catch (final Throwable t) {
+            throw new CompatibilityException(t);
+        }
     }
-    catch (final CompatibilityException e)
-    {
-      throw e;
-    }
-    catch (final Throwable t)
-    {
-      throw new CompatibilityException(t);
-    }
-  }
 
-  public ProxyProperties getHttpProxy() throws CompatibilityException
-  {
-    try
-    {
-      return ProxyProperties.fromObject(
-          Class.forName("android.net.LinkProperties")
-              .getMethod("getHttpProxy")
-              .invoke(this.linkProperties));
+    public void setHttpProxy(final ProxyProperties proxyProperties) throws CompatibilityException {
+        try {
+            Class.forName("android.net.LinkProperties")
+                    .getMethod("setHttpProxy", Class.forName("android.net.ProxyProperties"))
+                    .invoke(this.linkProperties, proxyProperties != null ? proxyProperties.toAndroidNetProxyProperties() : null);
+        } catch (final CompatibilityException e) {
+            throw e;
+        } catch (final Throwable t) {
+            throw new CompatibilityException(t);
+        }
     }
-    catch (final CompatibilityException e)
-    {
-      throw e;
-    }
-    catch (final Throwable t)
-    {
-      throw new CompatibilityException(t);
-    }
-  }
 
-  @Override
-  public String toString()
-  {
-    return this.isValid() ? this.linkProperties.toString() : null;
-  }
+    @Override
+    public String toString() {
+        return this.isValid() ? this.linkProperties.toString() : null;
+    }
 }

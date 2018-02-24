@@ -25,13 +25,11 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -61,7 +59,44 @@ public class Preferences extends SummarizedPreferences {
 
     private RefreshableListPreference subscriptionList;
     private String subscriptionSummary;
-
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            final String action = intent.getAction();
+            final Bundle extra = intent.getExtras();
+            if (action.equals(ProxyService.BROADCAST_STATE_CHANGED)) {
+                if (extra.getBoolean("enabled")) {
+                    // Service is enabled in manual mode
+                    if (extra.getBoolean("manual")) {
+                        // Proxy is properly configured
+                        if (extra.getBoolean("configured"))
+                            hideConfigurationMsg();
+                        else
+                            showConfigurationMsg(getString(R.string.msg_configuration));
+                    }
+                } else {
+                    setFilteringEnabled(false);
+                    hideConfigurationMsg();
+                }
+            }
+            if (action.equals(ProxyService.BROADCAST_PROXY_FAILED)) {
+                final String msg = extra.getString("msg");
+                new AlertDialog.Builder(Preferences.this).setTitle(R.string.error).setMessage(msg).setIcon(android.R.drawable.ic_dialog_alert).setPositiveButton(R.string.ok, null).create().show();
+                setFilteringEnabled(false);
+            }
+            if (action.equals(AdblockPlus.BROADCAST_SUBSCRIPTION_STATUS)) {
+                // TODO Should check if url matches active subscription
+                final String text = extra.getString("status");
+                final long time = extra.getLong("time");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setSubscriptionStatus(text, time);
+                    }
+                });
+            }
+        }
+    };
     private ServiceBinder serviceBinder = null;
 
     @Override
@@ -239,7 +274,7 @@ public class Preferences extends SummarizedPreferences {
     public boolean onCreateOptionsMenu(final Menu menu) {
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_preferences, menu);
-        for(int i = 0; i < menu.size(); i++) {
+        for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
             SpannableString spanString = new SpannableString(menu.getItem(i).getTitle().toString());
             spanString.setSpan(new ForegroundColorSpan(ResourcesCompat.getColor(getResources(), R.color.menuTextColor, null)), 0, spanString.length(), 0); //fix the color to white
@@ -414,45 +449,6 @@ public class Preferences extends SummarizedPreferences {
         final ViewGroup grp = (ViewGroup) findViewById(R.id.grp_configuration);
         grp.setVisibility(View.GONE);
     }
-
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            final String action = intent.getAction();
-            final Bundle extra = intent.getExtras();
-            if (action.equals(ProxyService.BROADCAST_STATE_CHANGED)) {
-                if (extra.getBoolean("enabled")) {
-                    // Service is enabled in manual mode
-                    if (extra.getBoolean("manual")) {
-                        // Proxy is properly configured
-                        if (extra.getBoolean("configured"))
-                            hideConfigurationMsg();
-                        else
-                            showConfigurationMsg(getString(R.string.msg_configuration));
-                    }
-                } else {
-                    setFilteringEnabled(false);
-                    hideConfigurationMsg();
-                }
-            }
-            if (action.equals(ProxyService.BROADCAST_PROXY_FAILED)) {
-                final String msg = extra.getString("msg");
-                new AlertDialog.Builder(Preferences.this).setTitle(R.string.error).setMessage(msg).setIcon(android.R.drawable.ic_dialog_alert).setPositiveButton(R.string.ok, null).create().show();
-                setFilteringEnabled(false);
-            }
-            if (action.equals(AdblockPlus.BROADCAST_SUBSCRIPTION_STATUS)) {
-                // TODO Should check if url matches active subscription
-                final String text = extra.getString("status");
-                final long time = extra.getLong("time");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setSubscriptionStatus(text, time);
-                    }
-                });
-            }
-        }
-    };
 
     /**
      * Constructs and updates subscription status text.

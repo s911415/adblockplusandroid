@@ -17,84 +17,72 @@
 
 package org.adblockplus.libadblockplus;
 
-public class AppInfo
-{
-  public final String version;
-  public final String name;
-  public final String application;
-  public final String applicationVersion;
-  public final String locale;
-  public final boolean developmentBuild;
+public class AppInfo {
+    public final String version;
+    public final String name;
+    public final String application;
+    public final String applicationVersion;
+    public final String locale;
+    public final boolean developmentBuild;
 
-  private AppInfo(final String version, final String name, final String application, final String applicationVersion,
-      final String locale, final boolean developmentBuild)
-  {
-    this.version = version;
-    this.name = name;
-    this.application = application;
-    this.applicationVersion = applicationVersion;
-    this.locale = locale;
-    this.developmentBuild = developmentBuild;
-  }
-
-  public static Builder builder()
-  {
-    return new Builder();
-  }
-
-  public static class Builder
-  {
-    private String version = "0";
-    private String name = "adblockplusandroid";
-    private String application = "android";
-    private String applicationVersion = "0";
-    private String locale = "en_US";
-    private boolean developmentBuild = false;
-
-    private Builder()
-    {
-
+    private AppInfo(final String version, final String name, final String application, final String applicationVersion,
+                    final String locale, final boolean developmentBuild) {
+        this.version = version;
+        this.name = name;
+        this.application = application;
+        this.applicationVersion = applicationVersion;
+        this.locale = locale;
+        this.developmentBuild = developmentBuild;
     }
 
-    public Builder setVersion(final String version)
-    {
-      this.version = version;
-      return this;
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public Builder setName(final String name)
-    {
-      this.name = name;
-      return this;
-    }
+    public static class Builder {
+        private String version = "0";
+        private String name = "adblockplusandroid";
+        private String application = "android";
+        private String applicationVersion = "0";
+        private String locale = "en_US";
+        private boolean developmentBuild = false;
 
-    public Builder setApplication(final String application)
-    {
-      this.application = application;
-      return this;
-    }
+        private Builder() {
 
-    public Builder setApplicationVersion(final String applicationVersion)
-    {
-      this.applicationVersion = applicationVersion;
-      return this;
-    }
+        }
 
-    public Builder setLocale(final String locale)
-    {
-      this.locale = locale;
-      return this;
-    }
+        public Builder setVersion(final String version) {
+            this.version = version;
+            return this;
+        }
 
-    public Builder setDevelopmentBuild(final boolean developmentBuild)
-    {
-      this.developmentBuild = developmentBuild;
-      return this;
-    }
+        public Builder setName(final String name) {
+            this.name = name;
+            return this;
+        }
 
-    public AppInfo build()
-    {
-      return new AppInfo(this.version, this.name, this.application, this.applicationVersion, this.locale, this.developmentBuild);
+        public Builder setApplication(final String application) {
+            this.application = application;
+            return this;
+        }
+
+        public Builder setApplicationVersion(final String applicationVersion) {
+            this.applicationVersion = applicationVersion;
+            return this;
+        }
+
+        public Builder setLocale(final String locale) {
+            this.locale = locale;
+            return this;
+        }
+
+        public Builder setDevelopmentBuild(final boolean developmentBuild) {
+            this.developmentBuild = developmentBuild;
+            return this;
+        }
+
+        public AppInfo build() {
+            return new AppInfo(this.version, this.name, this.application, this.applicationVersion, this.locale, this.developmentBuild);
+        }
     }
-  }
 }

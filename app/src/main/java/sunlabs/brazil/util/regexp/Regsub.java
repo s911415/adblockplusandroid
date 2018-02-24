@@ -2,22 +2,22 @@
  * Regsub.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 1999-2004 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: cstevens.
  * Portions created by cstevens are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): cstevens, suhler.
  *
  * Version:  2.3
@@ -91,21 +91,20 @@ package sunlabs.brazil.util.regexp;
  * }
  * </pre>
  *
- * @author	Colin Stevens (colin.stevens@sun.com)
- * @version		2.3
- * @see		Regexp
+ * @author Colin Stevens (colin.stevens@sun.com)
+ * @version 2.3
+ * @see        Regexp
  */
-public class Regsub
-{
+public class Regsub {
     Regexp r;
     String str;
     int ustart;
     int mstart;
     int end;
-    Regexp.Match m;   
+    Regexp.Match m;
 
     /**
-     * Construct a new <code>Regsub</code> that can be used to step 
+     * Construct a new <code>Regsub</code> that can be used to step
      * through the given string, finding each substring that matches
      * the given regular expression.
      * <p>
@@ -113,23 +112,17 @@ public class Regsub
      * <code>sub</code> and <code>subAll</code>, that can be used instead
      * of <code>Regsub</code> if just simple substitutions are being done.
      *
-     * @param	r
-     *		The compiled regular expression.
-     *
-     * @param	str
-     *		The string to search.
-     *
-     * @see	Regexp#sub
-     * @see	Regexp#subAll
+     * @param    r The compiled regular expression.
+     * @param    str The string to search.
+     * @see    Regexp#sub
+     * @see    Regexp#subAll
      */
-    public
-    Regsub(Regexp r, String str)
-    {
-	this.r = r;
-	this.str = str;
-	this.ustart = 0;
-	this.mstart = -1;
-	this.end = 0;
+    public Regsub(Regexp r, String str) {
+        this.r = r;
+        this.str = str;
+        this.ustart = 0;
+        this.mstart = -1;
+        this.end = 0;
     }
 
     /**
@@ -141,37 +134,36 @@ public class Regsub
      * Calling this function again will search for the next match, beginning
      * at the character just after where the last match ended.
      *
-     * @return	<code>true</code> if a match was found, <code>false</code>
-     *		if there are no more matches.
+     * @return    <code>true</code> if a match was found, <code>false</code>
+     * if there are no more matches.
      */
     public boolean
-    nextMatch()
-    {
-	ustart = end;
+    nextMatch() {
+        ustart = end;
 
-	/*
-	 * Consume one character if the last match didn't consume any
-	 * characters, to avoid an infinite loop.
-	 */
+        /*
+         * Consume one character if the last match didn't consume any
+         * characters, to avoid an infinite loop.
+         */
 
-	int off = ustart;
-	if (off == mstart) {
-	    off++;
-	    if (off >= str.length()) {
-	        return false;
-	    }
-	}
+        int off = ustart;
+        if (off == mstart) {
+            off++;
+            if (off >= str.length()) {
+                return false;
+            }
+        }
 
 
-	m = r.exec(str, 0, off);
-	if (m == null) {
-	    return false;
-	}
+        m = r.exec(str, 0, off);
+        if (m == null) {
+            return false;
+        }
 
-	mstart = m.indices[0];
-	end = m.indices[1];
+        mstart = m.indices[0];
+        end = m.indices[1];
 
-	return true;
+        return true;
     }
 
     /**
@@ -182,27 +174,24 @@ public class Regsub
      * This method can be used extract all the portions of string that
      * <b>didn't</b> match the regular expression.
      *
-     * @return	The characters that didn't match.
+     * @return The characters that didn't match.
      */
     public String
-    skipped()
-    {
-	return str.substring(ustart, mstart);
+    skipped() {
+        return str.substring(ustart, mstart);
     }
 
     /**
      * Returns a substring consisting of the characters that matched
      * the entire regular expression during the last call to
-     * <code>nextMatch</code>.  
+     * <code>nextMatch</code>.
      *
-     * @return	The characters that did match.
-     *
-     * @see	#submatch
+     * @return The characters that did match.
+     * @see    #submatch
      */
     public String
-    matched()
-    {
-	return str.substring(mstart, end);
+    matched() {
+        return str.substring(mstart, end);
     }
 
     /**
@@ -210,25 +199,22 @@ public class Regsub
      * the given parenthesized subexpression during the last call to
      * <code>nextMatch</code>.
      *
-     * @param	i
-     *		The index of the parenthesized subexpression.
-     *
-     * @return	The characters that matched the subexpression, or
-     *		<code>null</code> if the given subexpression did not
-     *		exist or did not match.
+     * @param    i The index of the parenthesized subexpression.
+     * @return The characters that matched the subexpression, or
+     * <code>null</code> if the given subexpression did not
+     * exist or did not match.
      */
     public String
-    submatch(int i)
-    {
-	if (m==null || (i * 2 + 1 >= m.indices.length)) {
-	    return null;
-	}
-	int start = m.indices[i * 2];
-	int end = m.indices[i * 2 + 1];
-	if ((start < 0) || (end < 0)) {
-	    return null;
-	}
-	return str.substring(start, end);
+    submatch(int i) {
+        if (m == null || (i * 2 + 1 >= m.indices.length)) {
+            return null;
+        }
+        int start = m.indices[i * 2];
+        int end = m.indices[i * 2 + 1];
+        if ((start < 0) || (end < 0)) {
+            return null;
+        }
+        return str.substring(start, end);
     }
 
     /**
@@ -238,19 +224,17 @@ public class Regsub
      * then this method will return the rest of the string that can't be
      * matched.
      *
-     * @return	The rest of the characters after the last match.
+     * @return The rest of the characters after the last match.
      */
     public String
-    rest()
-    {
-	return str.substring(end);
+    rest() {
+        return str.substring(end);
     }
 
     /**
      * Return the regexp used by this regsub.
      */
-    public Regexp getRegexp()
-    {
-	return r;
+    public Regexp getRegexp() {
+        return r;
     }
 }

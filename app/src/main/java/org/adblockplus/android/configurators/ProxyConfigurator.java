@@ -23,54 +23,50 @@ import java.net.InetAddress;
  * Interface for different proxy registration types. Constructor must always succeed, do any work that may fail in
  * {@link ProxyConfigurator#initialize()}.
  */
-public interface ProxyConfigurator
-{
-  /**
-   * Initializes this {@code ProxyConfigurator}. This function will normally get called only once.
-   *
-   * @return {@code true} if initialization succeeded
-   */
-  public boolean initialize();
+public interface ProxyConfigurator {
+    /**
+     * Initializes this {@code ProxyConfigurator}. This function will normally get called only once.
+     *
+     * @return {@code true} if initialization succeeded
+     */
+    public boolean initialize();
 
-  /**
-   * Registers the proxy. May get called multiple times (e.g. for enable/disable).
-   *
-   * @param address
-   *          The address ...
-   * @param port
-   *          ... and port to bind to
-   * @return {@code true} if registration succeeded
-   */
-  public boolean registerProxy(InetAddress address, int port);
+    /**
+     * Registers the proxy. May get called multiple times (e.g. for enable/disable).
+     *
+     * @param address The address ...
+     * @param port    ... and port to bind to
+     * @return {@code true} if registration succeeded
+     */
+    public boolean registerProxy(InetAddress address, int port);
 
-  /**
-   * Unregisters the proxy. May get called multiple times (e.g. for enable/disable).
-   */
-  public void unregisterProxy();
+    /**
+     * Unregisters the proxy. May get called multiple times (e.g. for enable/disable).
+     */
+    public void unregisterProxy();
 
-  /**
-   * Shuts down this configurator, normally called on application exit to perform any clean up.
-   *
-   * @param context
-   *          Service/Application context
-   */
-  public void shutdown();
+    /**
+     * Shuts down this configurator, normally called on application exit to perform any clean up.
+     *
+     * @param context Service/Application context
+     */
+    public void shutdown();
 
-  /**
-   * @return {@code true} if we actually registered the proxy
-   */
-  public boolean isRegistered();
+    /**
+     * @return {@code true} if we actually registered the proxy
+     */
+    public boolean isRegistered();
 
-  /**
-   * Returning {@code true} here will allow the configurator to succeed on {@link #initialize()} and fail on {@link #registerProxy(InetAddress, int)}.
-   * This situation could arise for the CyanogenMod and iptables case.
-   *
-   * @return {@code true} to disable auto-advancing in configurator list
-   */
-  public boolean isSticky();
+    /**
+     * Returning {@code true} here will allow the configurator to succeed on {@link #initialize()} and fail on {@link #registerProxy(InetAddress, int)}.
+     * This situation could arise for the CyanogenMod and iptables case.
+     *
+     * @return {@code true} to disable auto-advancing in configurator list
+     */
+    public boolean isSticky();
 
-  /**
-   * @return the registration type of this configurator.
-   */
-  public ProxyRegistrationType getType();
+    /**
+     * @return the registration type of this configurator.
+     */
+    public ProxyRegistrationType getType();
 }

@@ -2,22 +2,22 @@
  * Server.java
  *
  * Brazil project web application toolkit,
- * export version: 2.3 
+ * export version: 2.3
  * Copyright (c) 1998-2005 Sun Microsystems, Inc.
  *
  * Sun Public License Notice
  *
- * The contents of this file are subject to the Sun Public License Version 
- * 1.0 (the "License"). You may not use this file except in compliance with 
+ * The contents of this file are subject to the Sun Public License Version
+ * 1.0 (the "License"). You may not use this file except in compliance with
  * the License. A copy of the License is included as the file "license.terms",
  * and also available at http://www.sun.com/
- * 
+ *
  * The Original Code is from:
  *    Brazil project web application toolkit release 2.3.
  * The Initial Developer of the Original Code is: suhler.
  * Portions created by suhler are Copyright (C) Sun Microsystems, Inc.
  * All Rights Reserved.
- * 
+ *
  * Contributor(s): cstevens, drach, rinaldo, suhler.
  *
  * Version:  2.4
@@ -260,34 +260,27 @@ import java.util.Properties;
  * <p>
  * Limitations:
  * <ul>
- * <li>Starts a new thread for each connection.  This may be expensive.  
+ * <li>Starts a new thread for each connection.  This may be expensive.
  * </ul>
  *
- * @author	Stephen Uhler (stephen.uhler@sun.com)
- * @author	Colin Stevens (colin.stevens@sun.com)
- * @version	2.4
+ * @author Stephen Uhler (stephen.uhler@sun.com)
+ * @author Colin Stevens (colin.stevens@sun.com)
+ * @version 2.4
  */
 
-public class Server 
-    extends Thread 
-{
+public class Server
+        extends Thread {
+    public static final int LOG_ERROR = 1;        // most severe
+    public static final int LOG_WARNING = 2;
+    public static final int LOG_LOG = 3;
+    public static final int LOG_INFORMATIONAL = 4;
+    public static final int LOG_DIAGNOSTIC = 5;    // least useful
     /**
      * The listening socket.  Every time a new socket is accepted,
-     * a new thread is created to read the HTTP requests from it.  
+     * a new thread is created to read the HTTP requests from it.
      */
     public ServerSocket listen;
-
-    /**
-     * The main Handler whose <code>respond</code> method is called for
-     * every HTTP request.  The <code>respond</code> method must be
-     * thread-safe since it handles HTTP requests concurrently from all the
-     * accepted sockets.
-     *
-     * @see	Handler#respond
-     */
-    private String handlerName;
     public Handler handler;
-
     /**
      * Hashtable containing arbitrary information that may be of interest to
      * a Handler.  This table is available to both methods of the
@@ -297,9 +290,8 @@ public class Server
      * {@link Request#props} in the {@link Handler#respond(Request)}
      * method.
      */
-    
-    public Properties props = null;
 
+    public Properties props = null;
     /**
      * The hostname that this Server should use to identify itself in
      * an HTTP Redirect.  If <code>null</code>, the hostname is derived
@@ -314,28 +306,24 @@ public class Server
      */
 
     public String hostName = null;
-
     /**
      * The protocol used to access this resource.  Normally <code>http</code>, but
      * can be changed for <code>ssl</code> to <code>https</code>
      */
 
     public String protocol = "http";
-
     /**
      * If non-null, restrict connections to just the specified ip addresses.
      * <p>
      * The default value is <code>null</code>.
      */
     public InetAddress[] restrict = null;
-
     /**
      * The string to return as the value for the "Server:" line in the HTTP
      * response header.  If <code>null</code>, then no "Server:" line is
      * returned.
      */
     public String name = "Brazil/2.0";
-
     /**
      * The handler is passed a prefix to identify which items in the
      * properties object are relevent.  By convention, non-empty strings
@@ -343,7 +331,6 @@ public class Server
      */
 
     public String prefix = "";
-
     /**
      * Time in milliseconds before this Server closes an idle socket or
      * in-progress request.
@@ -351,7 +338,6 @@ public class Server
      * The default value is <code>30000</code>.
      */
     public int timeout = 30000;
-
     /**
      * Maximum number of consecutive requests allowed on a single
      * kept-alive socket.
@@ -359,167 +345,162 @@ public class Server
      * The default value is <code>25</code>.
      */
     public int maxRequests = 25;
-
     /**
      * The max number of threads allowed for the entire VM
      * (default is 250).
      */
     public int maxThreads = 250;
-
     /**
      * Maximum amout of POST data allowed per request (in bytes)
      * (default = 2Meg).
      */
-    public int maxPost = 2097152;		// 2 Meg
-
+    public int maxPost = 2097152;        // 2 Meg
     /**
-     * Default buffer size for copies to and from client sockets.  
+     * Default buffer size for copies to and from client sockets.
      * (default is 8192)
      */
     public int bufsize = 8192;
-    
     /**
      * Count of accepted connections so far.
      */
     public int acceptCount = 0;
-    
     /**
      * Count of HTTP requests received so far.
      */
     public int requestCount = 0;
-
     /**
      * Count of errors that occurred so far.
      */
     public int errorCount = 0;
-
     /**
      * The diagnostic level. 0->least, 5->most
      */
 
     public int logLevel = LOG_LOG;
-
     /**
      * If set, the server will terminate with an initialization failure
      * just before creating the listen socket.
      */
 
     public boolean initFailure = false;
-
     ThreadGroup group;
+    /**
+     * The main Handler whose <code>respond</code> method is called for
+     * every HTTP request.  The <code>respond</code> method must be
+     * thread-safe since it handles HTTP requests concurrently from all the
+     * accepted sockets.
+     *
+     * @see    Handler#respond
+     */
+    private String handlerName;
 
     /**
-     * Create a server using the provided listener socket.  
+     * Create a server using the provided listener socket.
      * <p>
      * This server will call the <code>Handler.respond</code> method
      * of the specified handler.  The specified handler should either
      * respond to the request or perform further dispatches to other
      * handlers.
      *
-     * @param	listen
-     *		The socket this server should listen to.
-     *		For ordinary sockets, this is simply: <code>
-     *		new ServerSocket(port)</code>, where <code>port</code>
-     *		is the network port to listen on.  Alternate implementations
-     *		of <code>ServerSocket</code>, such as <b>ssl</b> versions
-     *		may be used instead.
-     * @param   handlerName
-     *		The name of the handler used to process http requests.
-     *		It must implement the {@link Handler} interface.
-     * @param	props
-     *		Arbitrary information made available to the handler.
-     *		May be <code>null</code>.
-     *
-     * @see	FileHandler
-     * @see	ChainHandler
+     * @param handlerName The name of the handler used to process http requests.
+     *                    It must implement the {@link Handler} interface.
+     * @param    listen The socket this server should listen to.
+     * For ordinary sockets, this is simply: <code>
+     * new ServerSocket(port)</code>, where <code>port</code>
+     * is the network port to listen on.  Alternate implementations
+     * of <code>ServerSocket</code>, such as <b>ssl</b> versions
+     * may be used instead.
+     * @param    props Arbitrary information made available to the handler.
+     * May be <code>null</code>.
+     * @see    FileHandler
+     * @see    ChainHandler
      */
 
-    public
-    Server(ServerSocket listen, String handlerName, Properties props)
-    {
-	setup(listen, handlerName, props);
+    public Server(ServerSocket listen, String handlerName, Properties props) {
+        setup(listen, handlerName, props);
     }
 
     /**
-     * Set up the server.  this allows a server to be created with 
+     * Set up the server.  this allows a server to be created with
      * newInstance() followed by setup(), instead of using the
      * above initializer, making it easier to start sub-classes
      * of the server.
      */
-    public Server() {}
+    public Server() {
+    }
 
     public boolean
-    setup(ServerSocket listen, String handlerName, Properties props)
-    {
-	if (this.props != null) {
-	    return false;	// alreasdy initialized
-	}
-	if (props == null) {
-	    props = new Properties();
-	}
-	this.listen = listen;
-	this.handlerName = handlerName;
-	this.props=props;
-	if (props.get("debugProps") != null) {
-	    PropertiesList.debug = true;
-	}
-	return true;
+    setup(ServerSocket listen, String handlerName, Properties props) {
+        if (this.props != null) {
+            return false;    // alreasdy initialized
+        }
+        if (props == null) {
+            props = new Properties();
+        }
+        this.listen = listen;
+        this.handlerName = handlerName;
+        this.props = props;
+        if (props.get("debugProps") != null) {
+            PropertiesList.debug = true;
+        }
+        return true;
     }
 
     public boolean
     init() {
-	if (props == null) {
-	    log(LOG_ERROR, "server", "Not properly initialized!");
-	    return false;
-	}
+        if (props == null) {
+            log(LOG_ERROR, "server", "Not properly initialized!");
+            return false;
+        }
         group = new ThreadGroup(prefix);
-	if (hostName == null) {
-	    try {
-	       hostName = InetAddress.getLocalHost().getHostAddress();
-	    } catch (UnknownHostException e) {
-	       log(LOG_ERROR, "server",
-	           "Can't find my own name, using \"localhost\"" +
-		   " (redirects may not work)");
-	       hostName="localhost";
-	    }
+        if (hostName == null) {
+            try {
+                hostName = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                log(LOG_ERROR, "server",
+                        "Can't find my own name, using \"localhost\"" +
+                                " (redirects may not work)");
+                hostName = "localhost";
+            }
 
-	}
-	if (Thread.currentThread().getName().startsWith("Thread-")) {
-	    Thread.currentThread().setName("server");
-	}
+        }
+        if (Thread.currentThread().getName().startsWith("Thread-")) {
+            Thread.currentThread().setName("server");
+        }
 
-	handler = ChainHandler.initHandler(this, prefix, handlerName);
+        handler = ChainHandler.initHandler(this, prefix, handlerName);
 
-	if (handler == null) {
-	    return false;
-	}
-	if (initFailure) {
-	    log(LOG_ERROR, handlerName, "Initilization failure");
-	    return false;
-	}
-	return true;
+        if (handler == null) {
+            return false;
+        }
+        if (initFailure) {
+            log(LOG_ERROR, handlerName, "Initilization failure");
+            return false;
+        }
+        return true;
     }
 
     /**
      * Restart the server with a new handler.
-     * @param newHandler	Name of the handler to restart the server with
+     *
+     * @param newHandler Name of the handler to restart the server with
      */
 
     public synchronized boolean restart(String newHandler) {
-	String oldHandlerName=handlerName;
-	Handler oldHandler=handler;
+        String oldHandlerName = handlerName;
+        Handler oldHandler = handler;
 
-	handlerName=newHandler;
-	if (init()) {
-	    log(LOG_INFORMATIONAL, this, "restarting with: " + newHandler);
-	    return true;
-	} else {
-	    log(LOG_WARNING, this, newHandler +
-		    " is invalid, retaining old handler");
-	    handlerName = oldHandlerName;
-	    handler=oldHandler;
-	    return false;
-	}
+        handlerName = newHandler;
+        if (init()) {
+            log(LOG_INFORMATIONAL, this, "restarting with: " + newHandler);
+            return true;
+        } else {
+            log(LOG_WARNING, this, newHandler +
+                    " is invalid, retaining old handler");
+            handlerName = oldHandlerName;
+            handler = oldHandler;
+            return false;
+        }
     }
 
     /**
@@ -535,112 +516,105 @@ public class Server
      * <code>hostName</code> or <code>bufsize</code>.
      */
     public void
-    run()
-    {
-	try {
-	    if (init() == false) {
-		return;
-	    }
+    run() {
+        try {
+            if (init() == false) {
+                return;
+            }
 
-	    listen.setSoTimeout(0);
-	    while (true) {
-		/*
-		 * Blocks until we have a connection on the socket.
-		 */
-		Socket sock = listen.accept();
-		String threadName = sock.getInetAddress().getHostAddress();
-		log(LOG_INFORMATIONAL, threadName, "new connection");
+            listen.setSoTimeout(0);
+            while (true) {
+                /*
+                 * Blocks until we have a connection on the socket.
+                 */
+                Socket sock = listen.accept();
+                String threadName = sock.getInetAddress().getHostAddress();
+                log(LOG_INFORMATIONAL, threadName, "new connection");
 
-		allowed:
-		if (restrict != null) {
-		    InetAddress addr = sock.getInetAddress();
-		    for (int i = 0; i < restrict.length; i++) {
-			if (restrict[i].equals(addr)) {
-			    break allowed;
-			}
-		    }
-		    log(LOG_DIAGNOSTIC, addr, "rejected request");
-		    sock.close();
-		    continue;
-		}
+                allowed:
+                if (restrict != null) {
+                    InetAddress addr = sock.getInetAddress();
+                    for (int i = 0; i < restrict.length; i++) {
+                        if (restrict[i].equals(addr)) {
+                            break allowed;
+                        }
+                    }
+                    log(LOG_DIAGNOSTIC, addr, "rejected request");
+                    sock.close();
+                    continue;
+                }
 
-		// A pseudo-busy loop!!!
+                // A pseudo-busy loop!!!
 
-		boolean warn=false;
-		while (Thread.activeCount() > maxThreads) {
-		    if (!warn) {
-			log(LOG_WARNING, sock, 
-				"Too many threads: " + maxThreads);
-		    }
-		    Thread.yield();
-		    warn = true;
-		}
+                boolean warn = false;
+                while (Thread.activeCount() > maxThreads) {
+                    if (!warn) {
+                        log(LOG_WARNING, sock,
+                                "Too many threads: " + maxThreads);
+                    }
+                    Thread.yield();
+                    warn = true;
+                }
 
-		new Thread(group, new Connection(this, sock),
-			threadName + "-" + acceptCount).start();
-		acceptCount++;
-	    }
-	} catch (IOException e) {
-	     System.err.println("Server failed to start: " + e);
-	} finally {
-	    try {
-		listen.close();
+                new Thread(group, new Connection(this, sock),
+                        threadName + "-" + acceptCount).start();
+                acceptCount++;
+            }
+        } catch (IOException e) {
+            System.err.println("Server failed to start: " + e);
+        } finally {
+            try {
+                listen.close();
 
-		Thread[] sub = new Thread[100];
-		int count;
-		while ((count = group.enumerate(sub, true)) > 0) {
-		    for (int i = 0; i < count; i++) {
-			sub[i].interrupt();
-			sub[i].join();
-		    }
-		    yield();
-		}
-	    } catch (Exception e) {}
+                Thread[] sub = new Thread[100];
+                int count;
+                while ((count = group.enumerate(sub, true)) > 0) {
+                    for (int i = 0; i < count; i++) {
+                        sub[i].interrupt();
+                        sub[i].join();
+                    }
+                    yield();
+                }
+            } catch (Exception e) {
+            }
 
-	    group = null;
-	}
+            group = null;
+        }
     }
 
     /**
      * Stop the server, and kill all pending requests
      */
     public void
-    close()
-    {
-	try {
-	    this.interrupt();
-	    this.join();
-	} catch (Exception e) {}
+    close() {
+        try {
+            this.interrupt();
+            this.join();
+        } catch (Exception e) {
+        }
 
-	log(LOG_WARNING, null, "server stopped");
+        log(LOG_WARNING, null, "server stopped");
     }
 
-    public static final int LOG_ERROR=1;		// most severe
-    public static final int LOG_WARNING=2;
-    public static final int LOG_LOG=3;
-    public static final int LOG_INFORMATIONAL=4;
-    public static final int LOG_DIAGNOSTIC=5;	// least useful
-
     /**
-     * Logs information about the socket to <code>System.out</code>.  
+     * Logs information about the socket to <code>System.out</code>.
      *
-     * @param	level	    Controls the verbosity (0=least 5=most)
-     * @param	obj	    The object that the message relates to.
-     * @param	message	    The message to be logged.
+     * @param    level     Controls the verbosity (0=least 5=most)
+     * @param    obj     The object that the message relates to.
+     * @param    message     The message to be logged.
      */
 
-    public void 
-    log(int level, Object obj, String message)
-    {
-	if (level <= logLevel) {
-	    System.out.print("LOG: " + level + " " + prefix
-		    + listen.getLocalPort() + "-"
-		    + Thread.currentThread().getName() + ": ");
-	    if (obj != null) {
-		System.out.print(obj);
-		System.out.print(": ");
-	    }
-	    System.out.println(message);
-	}
+    public void
+    log(int level, Object obj, String message) {
+        if (level <= logLevel) {
+            System.out.print("LOG: " + level + " " + prefix
+                    + listen.getLocalPort() + "-"
+                    + Thread.currentThread().getName() + ": ");
+            if (obj != null) {
+                System.out.print(obj);
+                System.out.print(": ");
+            }
+            System.out.println(message);
+        }
     }
 }

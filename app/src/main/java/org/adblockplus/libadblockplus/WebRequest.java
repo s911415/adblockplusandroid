@@ -19,50 +19,43 @@ package org.adblockplus.libadblockplus;
 
 import java.util.List;
 
-public abstract class WebRequest implements Disposable
-{
-  private final Disposer disposer;
-  protected final long ptr;
-
-  static
-  {
-    System.loadLibrary("adblockplus-jni");
-    registerNatives();
-  }
-
-  public WebRequest()
-  {
-    this.ptr = ctor(this);
-    this.disposer = new Disposer(this, new DisposeWrapper(this.ptr));
-  }
-
-  public abstract ServerResponse httpGET(String url, List<HeaderEntry> headers);
-
-  @Override
-  public void dispose()
-  {
-    this.disposer.dispose();
-  }
-
-  private final static class DisposeWrapper implements Disposable
-  {
-    private final long ptr;
-
-    public DisposeWrapper(final long ptr)
-    {
-      this.ptr = ptr;
+public abstract class WebRequest implements Disposable {
+    static {
+        System.loadLibrary("adblockplus-jni");
+        registerNatives();
     }
+
+    protected final long ptr;
+    private final Disposer disposer;
+
+    public WebRequest() {
+        this.ptr = ctor(this);
+        this.disposer = new Disposer(this, new DisposeWrapper(this.ptr));
+    }
+
+    private final static native void registerNatives();
+
+    private final static native long ctor(Object callbackObject);
+
+    private final static native void dtor(long ptr);
+
+    public abstract ServerResponse httpGET(String url, List<HeaderEntry> headers);
 
     @Override
-    public void dispose()
-    {
-      dtor(this.ptr);
+    public void dispose() {
+        this.disposer.dispose();
     }
-  }
 
-  private final static native void registerNatives();
+    private final static class DisposeWrapper implements Disposable {
+        private final long ptr;
 
-  private final static native long ctor(Object callbackObject);
+        public DisposeWrapper(final long ptr) {
+            this.ptr = ptr;
+        }
 
-  private final static native void dtor(long ptr);
+        @Override
+        public void dispose() {
+            dtor(this.ptr);
+        }
+    }
 }

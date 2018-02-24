@@ -17,11 +17,14 @@
 
 package org.adblockplus.android;
 
-public enum ProxyServerType
-{
-  UNKNOWN,
-  /** A pure http proxy */
-  HTTP,
-  /** Http and https proxy. */
-  HTTPS
+public enum ProxyServerType {
+    UNKNOWN,
+    /**
+     * A pure http proxy
+     */
+    HTTP,
+    /**
+     * Http and https proxy.
+     */
+    HTTPS
 }
