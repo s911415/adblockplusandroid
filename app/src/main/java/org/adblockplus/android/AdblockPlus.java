@@ -224,6 +224,15 @@ public class AdblockPlus extends Application {
     }
 
     /**
+     * Enforces subscription status update.
+     *
+     * @param url Subscription url
+     */
+    public org.adblockplus.libadblockplus.Subscription getSubscriptionByUrl(final String url) {
+        return abpEngine.getFilterEngine().getSubscription(url);
+    }
+
+    /**
      * Enables or disables Acceptable Ads
      */
     public void setAcceptableAdsEnabled(final boolean enabled) {
@@ -354,13 +363,13 @@ public class AdblockPlus extends Application {
         if (abpEngine == null) {
             final File basePath = getFilesDir();
             AppInfo appInfo = AdblockEngine.generateAppInfo(this, BuildConfig.DEBUG);
-            abpEngine = create(this, appInfo, basePath.getAbsolutePath(), true);
+            abpEngine = create(this, appInfo, basePath.getAbsolutePath(), false);
         }
     }
 
-    private static AdblockEngine create(final Context context, final AppInfo appInfo, final String basePath, boolean enableElemhide) {
+    private static AdblockEngine create(final Context context, final AppInfo appInfo, final String basePath, boolean enableElemHide) {
         final AdblockEngine engine = AdblockEngine.builder(appInfo, basePath)
-                .enableElementHiding(enableElemhide)
+                .enableElementHiding(enableElemHide)
                 .setUpdateAvailableCallback(new AndroidUpdateAvailableCallback(context))
                 .setFilterChangeCallback(new AndroidFilterChangeCallback(context))
                 .setUpdateCheckDoneCallback(new AndroidUpdateCheckDoneCallback(context))

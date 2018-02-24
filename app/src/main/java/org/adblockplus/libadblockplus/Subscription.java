@@ -23,7 +23,7 @@ public final class Subscription extends JsValue {
         registerNatives();
     }
 
-    public Subscription(final long ptr) {
+    private Subscription(final long ptr) {
         super(ptr);
     }
 

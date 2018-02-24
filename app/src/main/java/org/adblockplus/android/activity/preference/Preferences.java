@@ -122,10 +122,6 @@ public class Preferences extends SummarizedPreferences {
         PreferenceManager.setDefaultValues(this, R.xml.preferences_advanced, true);
         setContentView(R.layout.preferences);
 
-//        getLayoutInflater().inflate(R.layout.toolbar, (ViewGroup) findViewById(android.R.id.content));
-//        Toolbar toolbar = (Toolbar) findViewById(R.layout.toolbar);
-//        setSupportActionBar(toolbar);
-
         addPreferencesFromResource(R.xml.preferences);
 
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

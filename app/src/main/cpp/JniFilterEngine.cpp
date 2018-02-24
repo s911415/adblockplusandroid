@@ -439,9 +439,9 @@ static jstring JNICALL JniGetAllowedConnectionType(JNIEnv* env, jclass clazz, jl
     AdblockPlus::FilterEngine& engine = GetFilterEngineRef(ptr);
     std::unique_ptr<std::string> value = engine.GetAllowedConnectionType();
 
-    if (value == NULL)
+    if (value == nullptr)
     {
-      return NULL;
+      return nullptr;
     }
 
     return JniStdStringToJava(env, *value.get());

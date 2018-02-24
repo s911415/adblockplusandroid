@@ -106,6 +106,7 @@ public final class Utils {
     }
 
     public static void updateSubscriptionStatus(final Context context, final String subUrl) {
+        updateSubscriptionStatus(context, AdblockPlus.getApplication().getSubscriptionByUrl(subUrl));
     }
 
     public static void appendRawTextFile(final Context context, final StringBuilder text, final int id) {
