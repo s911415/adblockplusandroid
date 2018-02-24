@@ -47,10 +47,7 @@ import org.adblockplus.libadblockplus.android.AdblockEngine;
 import org.adblockplus.libadblockplus.android.Subscription;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -73,6 +70,7 @@ public class AdblockPlus extends Application {
     private static final Pattern RE_FONT = Pattern.compile("\\.(?:ttf|woff)$", Pattern.CASE_INSENSITIVE);
     private static final Pattern RE_HTML = Pattern.compile("\\.html?$", Pattern.CASE_INSENSITIVE);
     private static AdblockPlus instance;
+    private byte[] injectContent = null;
     private final ReferrerMapping referrerMapping = new ReferrerMapping();
     /**
      * Cached list of recommended subscriptions.
@@ -206,6 +204,7 @@ public class AdblockPlus extends Application {
      * Forces subscriptions refresh.
      */
     public void refreshSubscriptions() {
+        initInjectionFile();
         for (final org.adblockplus.libadblockplus.Subscription s : abpEngine.getFilterEngine().getListedSubscriptions()) {
             s.updateFilters();
         }
@@ -364,7 +363,43 @@ public class AdblockPlus extends Application {
             final File basePath = getFilesDir();
             AppInfo appInfo = AdblockEngine.generateAppInfo(this, BuildConfig.DEBUG);
             abpEngine = create(this, appInfo, basePath.getAbsolutePath(), false);
+            initInjectionFile();
         }
+    }
+
+    private void initInjectionFile() {
+        initInjectionFile(getExternalFilesDir("scripts"));
+    }
+
+    private void initInjectionFile(File basePath) {
+        File inject = new File(basePath, "script.js");
+        if (!inject.exists()) {
+            try {
+                inject.createNewFile();
+
+                Log.i(TAG, "Inject file created.");
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        }
+
+        if (inject.exists()) {
+            injectContent = null;
+            try {
+                BufferedInputStream buf = new BufferedInputStream(new FileInputStream(inject));
+                injectContent = new byte[((Long) inject.length()).intValue()];
+                buf.read(injectContent, 0, injectContent.length);
+                buf.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage(), e);
+            }
+        } else {
+            Log.w(TAG, "Create file error");
+        }
+    }
+
+    public byte[] getInjectContent() {
+        return injectContent;
     }
 
     private static AdblockEngine create(final Context context, final AppInfo appInfo, final String basePath, boolean enableElemHide) {
@@ -387,6 +422,7 @@ public class AdblockPlus extends Application {
         if (abpEngine != null) {
             abpEngine.dispose();
             abpEngine = null;
+            injectContent = null;
             Log.i(TAG, "stopEngine");
         }
     }

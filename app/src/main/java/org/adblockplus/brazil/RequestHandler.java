@@ -152,12 +152,14 @@ public class RequestHandler extends BaseRequestHandler {
         final HttpRequest target = new HttpRequest(url);
         if (url.startsWith("http://254.235.252.251")) {
             request.keepAlive = false;
-            if (url.endsWith("/__script.js")) {
+            byte[] content = AdblockPlus.getApplication().getInjectContent();
+            if (content!=null && url.endsWith("/__script.js")) {
                 request.responseHeaders.add("Via", "Inject");
                 request.responseHeaders.add("Connection", "close");
                 request.responseHeaders.add("Access-Control-Allow-Origin", "*");
-                request.sendHeaders(200, "application/javascript; charset=UTF-8", -1);
-                request.out.write("console.log('你好');".getBytes("UTF-8"));
+                request.responseHeaders.add("Cache-Control", "no-store");
+                request.sendHeaders(200, "application/javascript; charset=UTF-8", content.length);
+                request.out.write(content);
                 request.out.flush();
             } else {
                 request.sendError(404, "Not Found.");
