@@ -46,6 +46,7 @@ import org.adblockplus.android.R;
 import org.adblockplus.android.Utils;
 import org.adblockplus.android.activity.ProxyConfigurationActivity;
 import org.adblockplus.android.activity.dialog.AboutDialog;
+import org.adblockplus.android.core.CertificateGenerator;
 import org.adblockplus.android.service.ProxyService;
 import org.adblockplus.android.service.ServiceBinder;
 import org.adblockplus.libadblockplus.android.Subscription;
@@ -306,6 +307,13 @@ public class Preferences extends SummarizedPreferences {
             case R.id.ref_script:
                 Snackbar.make(this.findViewById(android.R.id.content), R.string.finish, Snackbar.LENGTH_SHORT).show();
                 AdblockPlus.getApplication().refreshInjectionFile();
+                return true;
+            case R.id.test_cert:
+                try{
+                    //CertificateGenerator.getCert(this, "localhost");
+                }catch(Exception e){
+
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

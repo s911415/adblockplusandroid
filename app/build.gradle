@@ -34,4 +34,8 @@ dependencies {
     //compile(name: 'libadblockplus-android-abi_all-release', ext: 'aar')
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support:design:26+'
+    compile 'com.madgag.spongycastle:core:1.54.0.0'
+    compile 'com.madgag.spongycastle:prov:1.54.0.0'
+    compile 'com.madgag.spongycastle:pkix:1.54.0.0'
+    compile 'com.madgag.spongycastle:pg:1.54.0.0'
 }

@@ -36,8 +36,10 @@ import org.adblockplus.android.activity.preference.Preferences;
 import org.adblockplus.android.configurators.ProxyConfigurator;
 import org.adblockplus.android.configurators.ProxyConfigurators;
 import org.adblockplus.android.configurators.ProxyRegistrationType;
+import org.adblockplus.android.core.HttpsProxy;
 import org.adblockplus.android.core.type.ProxyServerType;
 import org.apache.commons.lang.StringUtils;
+import org.nanohttpd.protocols.http.NanoHTTPD;
 import sunlabs.brazil.server.Server;
 import sunlabs.brazil.util.Base64;
 
@@ -83,6 +85,7 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
         }
     };
     protected ProxyServer proxy = null;
+    protected NanoHTTPD nanoHTTPD = null;
     protected int port;
     boolean hideIcon;
     private ProxyConfigurator proxyConfigurator = null;
@@ -232,6 +235,7 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
             configureUserProxy(proxyConfiguration, proxyHost, proxyPort, proxyExcl, proxyUser, proxyPass);
 
             proxy = new ProxyServer();
+            nanoHTTPD = new HttpsProxy(this, LOCALHOST, port + 1);
             proxy.logLevel = Server.LOG_LOG;
             proxy.setup(listen, proxyConfiguration.getProperty("handler"), proxyConfiguration);
             proxy.start();
@@ -271,6 +275,11 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
         if (proxy != null) {
             proxy.close();
             proxy = null;
+        }
+        // Stop proxy server
+        if (nanoHTTPD != null) {
+            nanoHTTPD.stop();
+            nanoHTTPD = null;
         }
 
         // Release service lock

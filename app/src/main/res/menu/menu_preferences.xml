@@ -23,5 +23,10 @@
         android:icon="@drawable/ic_menu_refresh"
         android:title="@string/menu_ref_script">
     </item>
+    <item
+        android:id="@+id/test_cert"
+        android:icon="@drawable/ic_menu_refresh"
+        android:title="Test Cert">
+    </item>
 
 </menu>
