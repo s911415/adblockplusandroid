@@ -42,7 +42,7 @@ public class IptablesProxyConfigurator implements ProxyConfigurator {
     private static final int DEFAULT_TIMEOUT = 3000;
     private static final String IPTABLES_RETURN = " -t nat -m owner --uid-owner {{UID}} -A OUTPUT -p tcp -j RETURN\n";
     private static final String IPTABLES_ADD_HTTP = " -t nat -A OUTPUT -p tcp --dport 80 -j REDIRECT --to {{PORT}}\n";
-
+    private static final String IPTABLES_ADD_HTTPS = " -t nat -A OUTPUT -p tcp -d 127.4.3.2 --dport 443 -j DNAT --to-destination 127.4.3.2:{{PORT}}\n";
     private final Context context;
     private String iptables;
     private boolean isRegistered = false;
@@ -172,6 +172,8 @@ public class IptablesProxyConfigurator implements ProxyConfigurator {
             cmd.append('\n');
             cmd.append(this.iptables);
             cmd.append(IPTABLES_ADD_HTTP.replace("{{PORT}}", String.valueOf(port)));
+            cmd.append(this.iptables);
+            cmd.append(IPTABLES_ADD_HTTPS.replace("{{PORT}}", String.valueOf(port + 1)));
 
             runRootCommand(cmd.toString(), DEFAULT_TIMEOUT);
 

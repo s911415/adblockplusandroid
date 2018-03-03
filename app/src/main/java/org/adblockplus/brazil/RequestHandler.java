@@ -78,6 +78,7 @@ public class RequestHandler extends BaseRequestHandler {
     static final Pattern RE_HTTP = Pattern.compile("^https?:");
     private static final AtomicLong BLOCKED_REQUESTS = new AtomicLong();
     private static final AtomicLong UNBLOCKED_REQUESTS = new AtomicLong();
+    public static final String MAGIC_IP = "254.235.252.251";
     private AdblockPlus application;
     private String via;
 
@@ -150,10 +151,17 @@ public class RequestHandler extends BaseRequestHandler {
         HttpRequest.removePointToPointHeaders(request.headers, false);
 
         final HttpRequest target = new HttpRequest(url);
-        if (url.startsWith("http://254.235.252.251")) {
+        boolean isGAnalytics = url.equals("http://www.google-analytics.com/analytics.js");
+        if (url.startsWith("http://" + MAGIC_IP) || isGAnalytics) {
             request.keepAlive = false;
             byte[] content = AdblockPlus.getApplication().getInjectContent();
-            if (content != null && url.endsWith("/__script.js")) {
+            if (
+                content != null &&
+                (
+                    isGAnalytics ||
+                    url.endsWith("/__script.js")
+                )
+            ) {
                 request.responseHeaders.add("Via", "Inject");
                 request.responseHeaders.add("Connection", "close");
                 request.responseHeaders.add("Access-Control-Allow-Origin", "*");

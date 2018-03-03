@@ -36,8 +36,10 @@ import org.adblockplus.android.activity.preference.Preferences;
 import org.adblockplus.android.configurators.ProxyConfigurator;
 import org.adblockplus.android.configurators.ProxyConfigurators;
 import org.adblockplus.android.configurators.ProxyRegistrationType;
+import org.adblockplus.android.core.HttpsProxy;
 import org.adblockplus.android.core.type.ProxyServerType;
 import org.apache.commons.lang.StringUtils;
+import org.nanohttpd.protocols.http.NanoHTTPD;
 import sunlabs.brazil.server.Server;
 import sunlabs.brazil.util.Base64;
 
@@ -66,6 +68,7 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
     public static final String PROXY_STATE_CHANGED_ACTION = "org.adblockplus.android.PROXY_STATE_CHANGED";
     private static final String TAG = Utils.getTag(ProxyService.class);
     private static final String LOCALHOST = "127.0.0.1";
+    private static final String LOCALHOST_HTTPS = "127.4.3.2";
     private static final int[] PORT_VARIANTS = new int[]{-1, 2020, 3030, 4040, 5050, 6060, 7070, 9090, 1234, 12345, 4321, 0};
     private static final boolean LOG_REQUESTS = false;
     private static final long POSITION_RIGHT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD ? Long.MIN_VALUE : Long.MAX_VALUE;
@@ -83,6 +86,7 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
         }
     };
     protected ProxyServer proxy = null;
+    protected NanoHTTPD nanoHTTPD = null;
     protected int port;
     boolean hideIcon;
     private ProxyConfigurator proxyConfigurator = null;
@@ -232,6 +236,7 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
             configureUserProxy(proxyConfiguration, proxyHost, proxyPort, proxyExcl, proxyUser, proxyPass);
 
             proxy = new ProxyServer();
+            nanoHTTPD = new HttpsProxy(this, LOCALHOST_HTTPS, port + 1);
             proxy.logLevel = Server.LOG_LOG;
             proxy.setup(listen, proxyConfiguration.getProperty("handler"), proxyConfiguration);
             proxy.start();
@@ -271,6 +276,11 @@ public class ProxyService extends Service implements OnSharedPreferenceChangeLis
         if (proxy != null) {
             proxy.close();
             proxy = null;
+        }
+        // Stop proxy server
+        if (nanoHTTPD != null) {
+            nanoHTTPD.stop();
+            nanoHTTPD = null;
         }
 
         // Release service lock
