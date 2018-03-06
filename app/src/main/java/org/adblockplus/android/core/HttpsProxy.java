@@ -62,7 +62,8 @@ public class HttpsProxy extends NanoHTTPD {
 
     @Override
     public Response serve(IHTTPSession session) {
-        if (session.getUri().equals("/analytics.js")) {
+        final String url = session.getUri();
+        if (url.equals("/analytics.js") || url.startsWith("/gtag/js")) {
             Response r = Response.newFixedLengthResponse(Status.OK, "application/javascript; charset=UTF-8", AdblockPlus.getApplication().getInjectContent());
             r.addHeader("Strict-Transport-Security", "max-age=31536000");
 

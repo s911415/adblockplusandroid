@@ -11,8 +11,8 @@ android {
         applicationId "org.adblockplus.android"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 401
-        versionName "2.1"
+        versionCode 402
+        versionName "2.11"
         ndk {
             abiFilters 'armeabi-v7a', 'x86'
         }
