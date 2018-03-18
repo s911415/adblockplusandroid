@@ -34,7 +34,7 @@ public class AndroidFilterChangeCallback extends FilterChangeCallback {
         if (action.equals("subscription.lastDownload") || action.equals("subscription.downloadStatus")) {
             JsValue url = jsValue.getProperty("url");
             try {
-                Utils.updateSubscriptionStatus(this.context, url.toString());
+                Utils.updateSubscriptionStatus(this.context, url.asString());
             } finally {
                 url.dispose();
             }
